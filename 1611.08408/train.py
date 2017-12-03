@@ -4,6 +4,14 @@ import random
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
+import torch.optim as optim
+from torch.autograd import Variable
+import torch.nn.functional as f
+
+
+import cv2
+
+
 
 from models import Generator, Discriminator
 
@@ -56,15 +64,64 @@ def weights_init(m):
     else:
         print ('Error!')
 
+def Interp(src, zoom=1, shrink=1):
+    # height_in =
+    # return cv2.resize(src, )
+    dst = ''
+    return dst
+
+def product(input, label_map):
+    b = input[:, 0, :, :].repeat(1, label_map.size()[1], 1, 1)
+    g = input[:, 1, :, :].repeat(1, label_map.size()[1], 1, 1)
+    r = input[:, 2, :, :].repeat(1, label_map.size()[1], 1, 1)
+
+    product_b = label_map * b
+    product_g = label_map * g
+    product_r = label_map * r
+
+    output = torch.cat((product_b, product_g, product_r), dim=1)
+
 def main():
-    input = torch.FloatTensor(opt.batchSize, opt.imageSize, opt.imageSize)
-    ground_truth = torch.FloatTensor(opt.batchSize, opt.imageSize, opt.imageSize)
-
-
     G = Generator(21)
     G.apply(weights_init)
 
     D = Discriminator(21)
     D.apply(weights_init)
 
-    G_Loss =
+    bceLoss = nn.BCEWithLogitsLoss()
+    mceLoss = nn.CrossEntropyLoss()
+
+    input = torch.FloatTensor(opt.batchSize, opt.imageSize, opt.imageSize)
+    ground_truth = torch.FloatTensor(opt.batchSize, opt.imageSize, opt.imageSize)
+    label = torch.FloatTensor(opt.batchSize)
+    real_label = 1
+    fake_label = 0
+
+    if opt.cuda:
+        G.cuda()
+        D.cuda()
+        bceLoss.cuda()
+        mceLoss.cuda()
+        input, ground_truth, label = input.cuda(), ground_truth.cuda(), label.cuda()
+
+
+    optimizerG = optim.Adam(G.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
+    optimizerD = optim.Adam(D.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
+
+    for epoch in range(opt.niter):
+        inputv = Variable(input)
+        ground_truthv = Variable(ground_truth)
+        ground_truth_Interpv = Variable(Interp(ground_truth))
+
+        D.zero_grad()
+        
+
+        G.zero_grad()
+        labelv = Variable(label.fill_(real_label))
+        outputG = G(inputv)
+        outputD = D(product(inputv,  f.softmax(outputG)))
+        GLoss = mceLoss(outputG, ground_truth_Interpv) + bceLoss(outputD, labelv)
+        GLoss.bachward()
+        optimizerG.step()
+
+
