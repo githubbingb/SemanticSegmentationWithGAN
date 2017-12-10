@@ -5,7 +5,7 @@ import cv2
 
 
 class Reader():
-    def __init__(self, data_root, txt, batchsize=1, scale=800):
+    def __init__(self, data_root, txt, batchsize=1, scale=801):
         self.data_root = data_root
         self.filelist = []
         self.batchsize = batchsize
@@ -37,7 +37,7 @@ class Reader():
 
             gt = cv2.imread(os.path.join(self.data_root, 'masks', self.filelist[self.index + i] + '.png'),
                             cv2.IMREAD_GRAYSCALE).astype(float)
-            gt_interp = cv2.resize(gt, (img.shape[0] / 8, img.shape[1] / 8), cv2.INTER_LINEAR)
+            gt_interp = cv2.resize(gt, ((img.shape[0]-1)/8+1, (img.shape[1]-1)/8+1), cv2.INTER_LINEAR)
             ground_truths_interp[:, :, i] = gt_interp
 
             print self.filelist[self.index + i]

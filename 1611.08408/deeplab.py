@@ -1,6 +1,19 @@
+import numpy as np
+import os
+import argparse
+import random
 import torch
 import torch.nn as nn
+import torch.backends.cudnn as cudnn
+import torch.optim as optim
+from torch.autograd import Variable
 import torch.nn.functional as f
+import torchvision.transforms as transforms
+from DataFolder import MyDataFolder
+from torch.utils.data import DataLoader
+from reader import Reader
+import torch.nn.functional as f
+from collections import OrderedDict
 
 
 class Deeplab(nn.Module):
@@ -91,8 +104,35 @@ class Deeplab(nn.Module):
 
     def forward(self, inputs):
         outputs = self.fc8_1(inputs) + self.fc8_2(inputs) + self.fc8_3(inputs) + self.fc8_4(inputs)
+        # utputs = self.fc8
         return outputs
 
+reader = Reader('/media/Disk/work/JM', '/media/Disk/work/odd_id.txt')
 
-model = Deeplab(21)
-print model, model.state_dict().keys()
+def main():
+    model = Deeplab(21)
+    model.load_state_dict('init.pkl')
+    mceLoss = nn.CrossEntropyLoss()
+
+    model.cuda()
+    mceLoss.cuda()
+
+    optimizer = optim.SGD(model.parameters(), lr=1e-3, momentum=0.9, weight_decay=5e-4)
+
+    for step in range(10000):
+        images, ground_truths = reader.next()
+        # label_onehot = torch.FloatTensor([onehot_encoder(label1.numpy()) for label1 in label])
+
+        imgs = Variable(torch.from_numpy(images).float().cuda())
+        gts = Variable(torch.from_numpy(ground_truths).float().cuda())
+
+        model.zero_grad()
+        pred_map = model(imgs)
+        loss = mceLoss(pred_map, gts)
+        loss.bachward()
+        optimizer.step()
+
+        print loss
+
+
+

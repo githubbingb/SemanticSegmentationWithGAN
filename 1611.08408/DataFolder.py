@@ -31,14 +31,14 @@ class MyDataFolder(data.Dataset):
 
     def __getitem__(self, index):
         img = self.loader(self.img_list[index])
-        print np.array(img - [104.008, 116.669, 122.675])
+        #print np.array(img - [104.008, 116.669, 122.675])
         label = self.loader(self.label_list[index], gray=True)
         label_interp = label.resize((label.size[0], label.size[1]))
         if self.transform is not None:
             img = self.transform(img)
             label = self.transform(label)
             label_interp = self.transform(label_interp)
-        return img, label, label_interp
+        return img, label_interp
 
     def __len__(self):
         return len(self.img_list)
