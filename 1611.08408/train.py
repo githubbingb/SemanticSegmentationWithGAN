@@ -7,7 +7,10 @@ import torch.backends.cudnn as cudnn
 import torch.optim as optim
 from torch.autograd import Variable
 import torch.nn.functional as f
-
+import torchvision.transforms as transforms
+from DataFolder import MyDataFolder
+from torch.utils.data import DataLoader
+from reader import Reader
 
 import cv2
 
@@ -21,6 +24,7 @@ parser.add_argument('--dataroot', required=True, help='path to dataset')
 parser.add_argument('--workers', type=int, help='number of data loading workers', default=2)
 parser.add_argument('--batchSize', type=int, default=64, help='input batch size')
 parser.add_argument('--imageSize', type=int, default=64, help='the height / width of the input image to network')
+parser.add_argument('--nclasses', type=int, default=21, help='number of classes')
 parser.add_argument('--nz', type=int, default=100, help='size of the latent z vector')
 parser.add_argument('--ngf', type=int, default=64)
 parser.add_argument('--ndf', type=int, default=64)
@@ -56,6 +60,15 @@ if torch.cuda.is_available() and not opt.cuda:
     print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
 
+# dataFolder = MyDataFolder(data_root='/media/Disk/work', txt='/media/Disk/work/train.txt',
+#                           transform=transforms.Compose([
+#                               transforms.RandomCrop(321),
+#                               transforms.RandomHorizontalFlip(),
+#                               transforms.ToTensor()]))
+# dataloader = DataLoader(dataset=dataFolder, batch_size=2, shuffle=False, num_workers=1)
+reader = Reader('/media/Disk/work/JM', '/media/Disk/work/odd_id.txt')
+
+
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
@@ -67,8 +80,7 @@ def weights_init(m):
 def Interp(src, zoom=1, shrink=1):
     # height_in =
     # return cv2.resize(src, )
-    dst = ''
-    return dst
+    pass
 
 def product(input, label_map):
     b = input[:, 0, :, :].repeat(1, label_map.size()[1], 1, 1)
@@ -79,49 +91,84 @@ def product(input, label_map):
     product_g = label_map * g
     product_r = label_map * r
 
-    output = torch.cat((product_b, product_g, product_r), dim=1)
+    return torch.cat((product_b, product_g, product_r), dim=1)
+
+
+def onehot_encoder(ground_truth):
+    for index, c in enumerate(range(0, opt.nclasses)):
+        mask = (ground_truth == c)
+        #mask.view(1, mask.shape[0], mask.shape[1])
+        if index == 0:
+            onehot = mask
+        else:
+            #print onehot.shape
+            onehot = np.concatenate((onehot, mask), axis=0)
+
+    return onehot.astype(float)
+
 
 def main():
-    G = Generator(21)
+    G = Generator(opt.nclasses)
     G.apply(weights_init)
 
-    D = Discriminator(21)
+    D = Discriminator(opt.nclasses)
     D.apply(weights_init)
 
-    bceLoss = nn.BCEWithLogitsLoss()
+    bceLoss = nn.BCELoss()
     mceLoss = nn.CrossEntropyLoss()
 
-    input = torch.FloatTensor(opt.batchSize, opt.imageSize, opt.imageSize)
-    ground_truth = torch.FloatTensor(opt.batchSize, opt.imageSize, opt.imageSize)
-    label = torch.FloatTensor(opt.batchSize)
-    real_label = 1
-    fake_label = 0
+    # input = torch.FloatTensor(opt.batchSize, 3, opt.imageSize, opt.imageSize)
+    # ground_truth = torch.FloatTensor(opt.batchSize, opt.imageSize, opt.imageSize)
+    # label = torch.FloatTensor(opt.batchSize)
+    # real_label = 1
+    # fake_label = 0
 
     if opt.cuda:
         G.cuda()
         D.cuda()
         bceLoss.cuda()
         mceLoss.cuda()
-        input, ground_truth, label = input.cuda(), ground_truth.cuda(), label.cuda()
-
+        # input, ground_truth, label = input.cuda(), ground_truth.cuda(), label.cuda()
 
     optimizerG = optim.Adam(G.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
     optimizerD = optim.Adam(D.parameters(), lr=opt.lr, betas=(opt.beta1, 0.999))
 
-    for epoch in range(opt.niter):
-        inputv = Variable(input)
-        ground_truthv = Variable(ground_truth)
-        ground_truth_Interpv = Variable(Interp(ground_truth))
+    for step in range(opt.niter):
+        images, ground_truths = reader.next()
+        # label_onehot = torch.FloatTensor([onehot_encoder(label1.numpy()) for label1 in label])
 
+        imgs = Variable(torch.from_numpy(images).float().cuda())
+        gts = Variable(torch.from_numpy(ground_truths).float().cuda())
+        real_label = Variable(torch.ones(opt.batchSize).cuda())
+        fake_label = Variable(torch.zeros(opt.batchSize).cuda())
+
+        # train Discriminator
         D.zero_grad()
-        
+        pred_map = G(imgs)
+        # x_fake = product(Interp(inputv), f.softmax(pred_map))
+        x_fake = f.softmax(pred_map)
+        y_fake = D(x_fake.detach())
+        DLoss_fake = bceLoss(f.sigmoid(y_fake), fake_label)
+        DLoss_fake.backward()
 
+        #x_real = product(Interp(inputv), one_hot(ground_truthv))
+        x_real = gts
+        y_real = D(x_real)
+        DLoss_real = bceLoss(f.sigmoid(y_real), real_label)
+        DLoss_real.backward()
+
+        optimizerG.step()
+
+        # train Generator
         G.zero_grad()
-        labelv = Variable(label.fill_(real_label))
-        outputG = G(inputv)
-        outputD = D(product(inputv,  f.softmax(outputG)))
-        GLoss = mceLoss(outputG, ground_truth_Interpv) + bceLoss(outputD, labelv)
+        pred_map = G(imgs)
+        #x_fake = product(inputv,  f.softmax(pred_map))
+        #x_fake = f.softmax(pred_map)
+        y_fake = D(x_fake)
+        GLoss = mceLoss(pred_map, gts) + bceLoss(y_fake, real_label)
         GLoss.bachward()
         optimizerG.step()
+
+        print DLoss_fake, DLoss_real, GLoss
 
 
