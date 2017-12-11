@@ -158,5 +158,7 @@ def main():
         if step % 1000 == 0:
             torch.save(model.state_dict(), 'step_%d.pth' % step)
 
+if __name__ == '__main__':
+    main()
 
 
