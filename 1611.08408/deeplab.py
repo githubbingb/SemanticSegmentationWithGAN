@@ -124,9 +124,32 @@ def weights_init(m):
         nn.init.constant(m.bias.data, 0)
 
 
+def accuracy(preds, targets):
+    preds = preds.numpy()
+    targets = targets.numpy()
+    print preds.shape
+    batch = preds.shape[0]
+
+    sum = 0
+    for i in xrange(batch):
+        pred = preds[i,:,:,:]
+        target = targets[i,:,:]
+
+        pred = np.argmax(pred, axis=1)
+
+        print pred.shape, target.shape
+
+        sum += (pred == target).sum()
+
+    return  sum*1.0/batch
+
+
+
 def main():
+
+    batsize = 2
     reader = Reader('/media/Disk/wangfuyu/data/cxr/801/',
-                '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt')
+                '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=batsize)
 
     model = Deeplab(2)
     model.apply(weights_init)
@@ -162,7 +185,10 @@ def main():
         loss.backward()
         optimizer.step()
 
-        print loss
+        print loss, accuracy(f.softmax(pred_map), gts)
+
+
+
 
         if step % 1000 == 0:
             torch.save(model.state_dict(), 'step_%d.pth' % step)
