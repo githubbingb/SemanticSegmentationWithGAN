@@ -113,10 +113,10 @@ class Deeplab(nn.Module):
         #     nn.Conv2d(1024, self.n_classes, kernel_size=1),
         # )
 
-    def forward(self, inputs):
-        inputs = self.features(inputs)
+    def forward(self, x):
+        x = self.features(x)
         #outputs = self.classifiers1(features) + self.classifiers2(features) + self.classifiers3(features) + self.classifiers4(features)
-        return inputs
+        return x
 
 
 def weights_init(m):
