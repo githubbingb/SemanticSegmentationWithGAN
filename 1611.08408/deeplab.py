@@ -18,7 +18,6 @@ from collections import OrderedDict
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
-lr = 1e-3
 max_step = 20000
 
 class Deeplab(nn.Module):
@@ -210,7 +209,7 @@ def main():
     # scheduler = LambdaLR(optimizer, lr_lambda=[lambda1, lambda2])
 
     for step in range(max_step):
-        adjust_learning_rate(optimizer, decay_rate=0.9, step=step)
+        # adjust_learning_rate(optimizer, decay_rate=0.9, step=step)
         images, ground_truths = reader.next()
 
         imgs = Variable(torch.from_numpy(images).float().cuda())
