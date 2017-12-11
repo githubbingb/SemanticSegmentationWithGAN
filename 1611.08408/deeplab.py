@@ -125,8 +125,8 @@ def weights_init(m):
 
 
 def accuracy(preds, targets):
-    preds = preds.numpy()
-    targets = targets.numpy()
+    preds = preds.data.numpy()
+    targets = targets.data.numpy()
     print preds.shape
     batch = preds.shape[0]
 
