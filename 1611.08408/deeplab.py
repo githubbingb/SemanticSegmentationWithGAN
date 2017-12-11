@@ -140,7 +140,7 @@ def accuracy(preds, targets):
 
         results += (pred == target).sum()
 
-    return  results*1.0/batch
+    return results*1.0/batch/preds.shape[1]/preds.shape[2]
 
 
 
