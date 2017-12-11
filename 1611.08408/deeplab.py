@@ -68,55 +68,55 @@ class Deeplab(nn.Module):
             nn.Conv2d(1024, self.n_classes, kernel_size=1),
 
         )
-        self.classifiers1 = nn.Sequential(
-            nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6),
-            nn.ReLU(True),
-            nn.Dropout(0.5, True),
-
-            nn.Conv2d(1024, 1024, kernel_size=1),
-            nn.ReLU(True),
-            nn.Dropout(0.5, True),
-
-            nn.Conv2d(1024, self.n_classes, kernel_size=1),
-        )
-        self.classifiers2 = nn.Sequential(
-            nn.Conv2d(512, 1024, kernel_size=3, padding=12, dilation=12),
-            nn.ReLU(True),
-            nn.Dropout(0.5, True),
-
-            nn.Conv2d(1024, 1024, kernel_size=1),
-            nn.ReLU(True),
-            nn.Dropout(0.5, True),
-
-            nn.Conv2d(1024, self.n_classes, kernel_size=1),
-        )
-        self.classifiers3 = nn.Sequential(
-            nn.Conv2d(512, 1024, kernel_size=3, padding=18, dilation=18),
-            nn.ReLU(True),
-            nn.Dropout(0.5, True),
-
-            nn.Conv2d(1024, 1024, kernel_size=1),
-            nn.ReLU(True),
-            nn.Dropout(0.5, True),
-
-            nn.Conv2d(1024, self.n_classes, kernel_size=1),
-        )
-        self.classifiers4 = nn.Sequential(
-            nn.Conv2d(512, 1024, kernel_size=3, padding=24, dilation=24),
-            nn.ReLU(True),
-            nn.Dropout(0.5, True),
-
-            nn.Conv2d(1024, 1024, kernel_size=1),
-            nn.ReLU(True),
-            nn.Dropout(0.5, True),
-
-            nn.Conv2d(1024, self.n_classes, kernel_size=1),
-        )
+        # self.classifiers1 = nn.Sequential(
+        #     nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6),
+        #     nn.ReLU(True),
+        #     nn.Dropout(0.5, True),
+        #
+        #     nn.Conv2d(1024, 1024, kernel_size=1),
+        #     nn.ReLU(True),
+        #     nn.Dropout(0.5, True),
+        #
+        #     nn.Conv2d(1024, self.n_classes, kernel_size=1),
+        # )
+        # self.classifiers2 = nn.Sequential(
+        #     nn.Conv2d(512, 1024, kernel_size=3, padding=12, dilation=12),
+        #     nn.ReLU(True),
+        #     nn.Dropout(0.5, True),
+        #
+        #     nn.Conv2d(1024, 1024, kernel_size=1),
+        #     nn.ReLU(True),
+        #     nn.Dropout(0.5, True),
+        #
+        #     nn.Conv2d(1024, self.n_classes, kernel_size=1),
+        # )
+        # self.classifiers3 = nn.Sequential(
+        #     nn.Conv2d(512, 1024, kernel_size=3, padding=18, dilation=18),
+        #     nn.ReLU(True),
+        #     nn.Dropout(0.5, True),
+        #
+        #     nn.Conv2d(1024, 1024, kernel_size=1),
+        #     nn.ReLU(True),
+        #     nn.Dropout(0.5, True),
+        #
+        #     nn.Conv2d(1024, self.n_classes, kernel_size=1),
+        # )
+        # self.classifiers4 = nn.Sequential(
+        #     nn.Conv2d(512, 1024, kernel_size=3, padding=24, dilation=24),
+        #     nn.ReLU(True),
+        #     nn.Dropout(0.5, True),
+        #
+        #     nn.Conv2d(1024, 1024, kernel_size=1),
+        #     nn.ReLU(True),
+        #     nn.Dropout(0.5, True),
+        #
+        #     nn.Conv2d(1024, self.n_classes, kernel_size=1),
+        # )
 
     def forward(self, inputs):
-        features = self.features(inputs)
+        inputs = self.features(inputs)
         #outputs = self.classifiers1(features) + self.classifiers2(features) + self.classifiers3(features) + self.classifiers4(features)
-        return features
+        return inputs
 
 
 def weights_init(m):
