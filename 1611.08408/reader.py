@@ -20,7 +20,7 @@ class Reader():
 
     def next(self):
         images = np.zeros((self.scale, self.scale, 3, self.batchsize))
-        ground_truths_interp = np.zeros((self.scale / 8, self.scale / 8, self.batchsize))
+        ground_truths_interp = np.zeros(((self.scale - 1) / 8 + 1, (self.scale - 1) / 8 + 1, self.batchsize))
 
         if self.index + self.batchsize > len(self.filelist):
             self.index = 0

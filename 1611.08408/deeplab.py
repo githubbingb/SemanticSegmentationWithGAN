@@ -116,7 +116,7 @@ def weights_init(m):
 
 def main():
     reader = Reader('/media/Disk/wangfuyu/data/cxr/801/',
-                    '/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/trainJM.txt')
+                    '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt')
 
     model = Deeplab(2)
     model.apply(weights_init)
