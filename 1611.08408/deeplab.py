@@ -127,7 +127,7 @@ def weights_init(m):
 
 def main():
     imgs = torch.FloatTensor(1, 3, 801, 801)
-    gts = torch.LongTensor(1, 801, 801)
+    gts = torch.LongTensor(1, 100, 100)
 
     reader = Reader('/media/Disk/wangfuyu/data/cxr/801/',
                     '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt')
