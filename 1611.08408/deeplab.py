@@ -15,6 +15,7 @@ from reader import Reader
 import torch.nn.functional as f
 from collections import OrderedDict
 
+lr = 1e-3
 
 class Deeplab(nn.Module):
     def __init__(self, n_classes):
@@ -139,7 +140,12 @@ def accuracy(preds, targets):
 
     return results*1.0/batch/preds.shape[1]/preds.shape[2]
 
-
+# def adjust_learning_rate(optimizer, step):
+#     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
+#
+#     lr = lr * (0.9 ** (1 - (step*1.0 / 20000)))
+#     for param_group in optimizer.param_groups:
+#         param_group['lr'] = lr
 
 def main():
 
@@ -149,18 +155,20 @@ def main():
 
     model = Deeplab(2)
     model.apply(weights_init)
-
-    keys = model.state_dict().keys()
+    model_dict = model.state_dict()
+    keys = model_dict.keys()
 
     print model, keys
 
-    pretrain_dict = np.load('/media/Disk/wangfuyu/voc12.npy').item()
+    pretrain_dict = {}
+    voc12_dict = np.load('/media/Disk/wangfuyu/voc12.npy').item()
+    for key in voc12_dict:
+        if key in model_dict:
+            pretrain_dict[key] = voc12_dict[key]
     print pretrain_dict.keys()
 
-    for key in keys:
-        if key in pretrain_dict.keys():
-            print key
-            model.state_dict()[key] = torch.from_numpy(pretrain_dict[key]).float()
+    model_dict.update(pretrain_dict)
+    model.load_state_dict(model_dict)
 
     mceLoss = nn.CrossEntropyLoss()
 
