@@ -155,12 +155,15 @@ def main():
         images, ground_truths = reader.next()
         # label_onehot = torch.FloatTensor([onehot_encoder(label1.numpy()) for label1 in label])
 
-        imgs = Variable(torch.from_numpy(images).float().cuda())
-        gts = Variable(torch.from_numpy(ground_truths).long().cuda())
+        imgs = torch.from_numpy(images).float().cuda()
+        gts = torch.from_numpy(ground_truths).long().cuda()
+
+        imgsv = Variable(imgs)
+        gtsv = Variable(gts)
 
         model.zero_grad()
-        pred_map = model(imgs)
-        loss = mceLoss(pred_map, gts)
+        pred_map = model(imgsv)
+        loss = mceLoss(pred_map, gtsv)
         loss.backward()
         optimizer.step()
 
