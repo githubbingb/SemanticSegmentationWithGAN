@@ -132,17 +132,17 @@ def main():
     model = Deeplab(2)
     model.apply(weights_init)
 
-    keys = model.state_dict().keys()
-
-    print model, keys
-
-    pretrain_dict = np.load('/media/Disk/wangfuyu/voc12.npy').item()
-    print pretrain_dict.keys()
-
-    for key in keys:
-        if key in pretrain_dict.keys():
-            print key
-            model.state_dict()[key] = torch.from_numpy(pretrain_dict[key]).float()
+    # keys = model.state_dict().keys()
+    #
+    # print model, keys
+    #
+    # pretrain_dict = np.load('/media/Disk/wangfuyu/voc12.npy').item()
+    # print pretrain_dict.keys()
+    #
+    # for key in keys:
+    #     if key in pretrain_dict.keys():
+    #         print key
+    #         model.state_dict()[key] = torch.from_numpy(pretrain_dict[key]).float()
 
     mceLoss = nn.CrossEntropyLoss()
 
