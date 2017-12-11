@@ -135,9 +135,8 @@ def accuracy(preds, targets):
         pred = np.array(preds[i,:,:,:])
         target = np.array(targets[i,:,:])
 
-        pred = np.argmax(pred, axis=1)
-
         print pred.shape, target.shape
+        pred = np.argmax(pred, axis=0)
 
         results += (pred == target).sum()
 
