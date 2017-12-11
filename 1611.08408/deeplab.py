@@ -184,10 +184,8 @@ def main():
         loss.backward()
         optimizer.step()
 
-        print loss, accuracy(f.softmax(pred_map), gts)
-
-
-
+        if step % 100 == 0:
+            print loss, accuracy(f.softmax(pred_map), gts)
 
         if step % 1000 == 0:
             torch.save(model.state_dict(), 'step_%d.pth' % step)
