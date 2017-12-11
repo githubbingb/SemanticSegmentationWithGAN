@@ -169,7 +169,7 @@ def main():
 
     optimizer = optim.SGD(model.parameters(), lr=1e-3, momentum=0.9, weight_decay=5e-4)
 
-    for step in range(10000):
+    for step in range(20000):
         images, ground_truths = reader.next()
 
         imgs = Variable(torch.from_numpy(images).float().cuda())
