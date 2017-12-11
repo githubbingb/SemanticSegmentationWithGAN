@@ -126,6 +126,9 @@ def weights_init(m):
         nn.init.constant(m.bias.data, 0)
 
 def main():
+    imgs = torch.FloatTensor(1, 3, 801, 801)
+    gts = torch.LongTensor(1, 801, 801)
+
     reader = Reader('/media/Disk/wangfuyu/data/cxr/801/',
                     '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt')
 
@@ -148,6 +151,7 @@ def main():
 
     model.cuda()
     mceLoss.cuda()
+    imgs, gts = imgs.cuda(), gts.cuda()
 
     optimizer = optim.SGD(model.parameters(), lr=1e-3, momentum=0.9, weight_decay=5e-4)
 
@@ -155,8 +159,8 @@ def main():
         images, ground_truths = reader.next()
         # label_onehot = torch.FloatTensor([onehot_encoder(label1.numpy()) for label1 in label])
 
-        imgs = torch.from_numpy(images).float().cuda()
-        gts = torch.from_numpy(ground_truths).long().cuda()
+        imgs.copy_(torch.from_numpy(images))
+        gts.copy_(torch.from_numpy(ground_truths))
 
         imgsv = Variable(imgs)
         gtsv = Variable(gts)
