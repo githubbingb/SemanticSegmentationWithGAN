@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import torch.optim as optim
+from torch.optim.lr_scheduler import LambdaLR
 from torch.autograd import Variable
 import torch.nn.functional as f
 import torchvision.transforms as transforms
@@ -15,7 +16,10 @@ from reader import Reader
 import torch.nn.functional as f
 from collections import OrderedDict
 
+os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+
 lr = 1e-3
+max_step = 20000
 
 class Deeplab(nn.Module):
     def __init__(self, n_classes):
@@ -60,7 +64,8 @@ class Deeplab(nn.Module):
             ])
         )
 
-        self.classifiers1 = nn.Sequential(OrderedDict(
+
+        self.fc1 = nn.Sequential(OrderedDict(
             [('fc6_1', nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6)),
              ('relu6_1', nn.ReLU(False)),
              ('dropout6_1', nn.Dropout(0.5, False)),
@@ -68,12 +73,14 @@ class Deeplab(nn.Module):
              ('fc7_1', nn.Conv2d(1024, 1024, kernel_size=1)),
              ('relu7_1', nn.ReLU(False)),
              ('dropout7_1', nn.Dropout(0.5, False)),
-
-             ('fc8_cxr_1', nn.Conv2d(1024, self.n_classes, kernel_size=1)),
              ])
         )
 
-        self.classifiers2 = nn.Sequential(OrderedDict(
+        self.classifiers1 = nn.Sequential(OrderedDict(
+            [('fc8_cxr_2', nn.Conv2d(1024, self.n_classes, kernel_size=1)),])
+        )
+
+        self.fc2 = nn.Sequential(OrderedDict(
             [('fc6_2', nn.Conv2d(512, 1024, kernel_size=3, padding=12, dilation=12)),
              ('relu6_2', nn.ReLU(False)),
              ('dropout6_2', nn.Dropout(0.5, False)),
@@ -81,12 +88,14 @@ class Deeplab(nn.Module):
              ('fc7_2', nn.Conv2d(1024, 1024, kernel_size=1)),
              ('relu7_2', nn.ReLU(False)),
              ('dropout7_2', nn.Dropout(0.5, False)),
-
-             ('fc8_cxr_2', nn.Conv2d(1024, self.n_classes, kernel_size=1)),
              ])
         )
 
-        self.classifiers3 = nn.Sequential(OrderedDict(
+        self.classifiers2 = nn.Sequential(OrderedDict(
+            [('fc8_cxr_2', nn.Conv2d(1024, self.n_classes, kernel_size=1)),])
+        )
+
+        self.fc3 = nn.Sequential(OrderedDict(
             [('fc6_3', nn.Conv2d(512, 1024, kernel_size=3, padding=16, dilation=16)),
              ('relu6_3', nn.ReLU(False)),
              ('dropout6_3', nn.Dropout(0.5, False)),
@@ -94,12 +103,14 @@ class Deeplab(nn.Module):
              ('fc7_3', nn.Conv2d(1024, 1024, kernel_size=1)),
              ('relu7_3', nn.ReLU(False)),
              ('dropout7_3', nn.Dropout(0.5, False)),
-
-             ('fc8_cxr_3', nn.Conv2d(1024, self.n_classes, kernel_size=1)),
              ])
         )
 
-        self.classifiers4 = nn.Sequential(OrderedDict(
+        self.classifiers3 = nn.Sequential(OrderedDict(
+            [('fc8_cxr_3', nn.Conv2d(1024, self.n_classes, kernel_size=1)),])
+        )
+
+        self.fc4 = nn.Sequential(OrderedDict(
             [('fc6_4', nn.Conv2d(512, 1024, kernel_size=3, padding=24, dilation=24)),
              ('relu6_4', nn.ReLU(False)),
              ('dropout6_4', nn.Dropout(0.5, False)),
@@ -107,21 +118,34 @@ class Deeplab(nn.Module):
              ('fc7_4', nn.Conv2d(1024, 1024, kernel_size=1)),
              ('relu7_4', nn.ReLU(False)),
              ('dropout7_4', nn.Dropout(0.5, False)),
-
-             ('fc8_cxr_4', nn.Conv2d(1024, self.n_classes, kernel_size=1)),
              ])
+        )
+
+        self.classifiers4 = nn.Sequential(OrderedDict(
+            [('fc8_cxr_4', nn.Conv2d(1024, self.n_classes, kernel_size=1)),])
         )
 
     def forward(self, inputs):
         features = self.features(inputs)
-        outputs = self.classifiers1(features) + self.classifiers2(features) + self.classifiers3(features) + self.classifiers4(features)
+        fc1 = self.fc1(features)
+        fc2 = self.fc2(features)
+        fc3 = self.fc3(features)
+        fc4 = self.fc4(features)
+        outputs = self.classifiers1(fc1) + self.classifiers2(fc2) + self.classifiers3(fc3) + self.classifiers4(fc4)
         return outputs
+
+
+def adjust_learning_rate(optimizer, decay_rate=0.9, step=0):
+    for param_group in optimizer.param_groups:
+        param_group['lr'] = param_group['lr'] * ((1 - 1.0*step/max_step)**decay_rate)
 
 
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
-        nn.init.xavier_normal(m.weight.data)
+        # nn.init.xavier_normal(m.weight.data)
+        # nn.init.constant(m.bias.data, 0)
+        nn.init.normal(m.weight.data, mean=0, std=0.01)
         nn.init.constant(m.bias.data, 0)
 
 
@@ -140,12 +164,6 @@ def accuracy(preds, targets):
 
     return results*1.0/batch/preds.shape[1]/preds.shape[2]
 
-# def adjust_learning_rate(optimizer, step):
-#     """Sets the learning rate to the initial LR decayed by 10 every 30 epochs"""
-#
-#     lr = lr * (0.9 ** (1 - (step*1.0 / 20000)))
-#     for param_group in optimizer.param_groups:
-#         param_group['lr'] = lr
 
 def main():
 
@@ -157,6 +175,8 @@ def main():
     model.apply(weights_init)
     model_dict = model.state_dict()
     keys = model_dict.keys()
+
+    model.classifiers4.parameters()
 
     print model, keys
 
@@ -174,9 +194,23 @@ def main():
     model.cuda()
     mceLoss.cuda()
 
-    optimizer = optim.SGD(model.parameters(), lr=1e-3, momentum=0.9, weight_decay=5e-4)
+    optimizer = optim.SGD([{'params': model.features.parameters()},
+                           {'params': model.fc1.parameters()},
+                           {'params': model.fc2.parameters()},
+                           {'params': model.fc3.parameters()},
+                           {'params': model.fc4.parameters()},
+                           {'params': model.classifiers1.parameters(), 'lr': 1e-2},
+                           {'params': model.classifiers2.parameters(), 'lr': 1e-2},
+                           {'params': model.classifiers3.parameters(), 'lr': 1e-2},
+                           {'params': model.classifiers4.parameters(), 'lr': 1e-2},
+                           ], lr=1e-3, momentum=0.9, weight_decay=5e-4)
 
-    for step in range(20000):
+    lambda1 = lambda step: (1 - 1.0 * step / max_step)
+    lambda2 = lambda step: step ** 0.95
+    scheduler = LambdaLR(optimizer, lr_lambda=[lambda1, lambda2])
+
+    for step in range(max_step):
+        scheduler.step()
         images, ground_truths = reader.next()
 
         imgs = Variable(torch.from_numpy(images).float().cuda())
@@ -193,6 +227,9 @@ def main():
 
         if step % 1000 == 0:
             torch.save(model.state_dict(), 'step_%d.pth' % step)
+
+
+        # adjust_learning_rate(optimizer, step=step)
 
 if __name__ == '__main__':
     main()
