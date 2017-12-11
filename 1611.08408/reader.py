@@ -1,6 +1,5 @@
 import os
 import numpy as np
-from matplotlib import pyplot as plt
 import cv2
 
 
@@ -44,6 +43,7 @@ class Reader():
 
         self.index += self.batchsize
         images = images.transpose((3, 2, 0, 1))
+        ground_truths_interp = ground_truths_interp.transpose((2,0,1))
         # print self.index
 
         return images, ground_truths_interp
