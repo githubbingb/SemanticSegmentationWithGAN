@@ -130,7 +130,7 @@ def accuracy(preds, targets):
     print preds.shape
     batch = preds.shape[0]
 
-    sum = 0
+    results = 0
     for i in xrange(batch):
         pred = np.array(preds[i,:,:,:])
         target = np.array(targets[i,:,:])
@@ -139,9 +139,9 @@ def accuracy(preds, targets):
 
         print pred.shape, target.shape
 
-        sum += (pred == target).sum()
+        results += (pred == target).sum()
 
-    return  sum*1.0/batch
+    return  results*1.0/batch
 
 
 
