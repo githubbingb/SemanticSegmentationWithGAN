@@ -164,8 +164,7 @@ def main():
     voc12_dict = np.load('/media/Disk/wangfuyu/voc12.npy').item()
     for key in voc12_dict:
         if key in model_dict:
-            pretrain_dict[key] = voc12_dict[key]
-    print pretrain_dict.keys()
+            pretrain_dict[key] = torch.from_numpy(voc12_dict[key]).float()
 
     model_dict.update(pretrain_dict)
     model.load_state_dict(model_dict)
