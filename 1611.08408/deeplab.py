@@ -132,8 +132,8 @@ def accuracy(preds, targets):
 
     sum = 0
     for i in xrange(batch):
-        pred = preds[i,:,:,:]
-        target = targets[i,:,:]
+        pred = np.array(preds[i,:,:,:])
+        target = np.array(targets[i,:,:])
 
         pred = np.argmax(pred, axis=1)
 

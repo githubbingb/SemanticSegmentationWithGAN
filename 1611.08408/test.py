@@ -72,9 +72,7 @@ import torchvision
 #         plt.imshow(diff)
 #         plt.show()
 
-model = torchvision.models.vgg16(pretrained=True)
-print model
-params = model.state_dict()
+a = np.array([2,1,3])
+b = np.array([2,1,2])
 
-for k,v in params.items():
-    print(k)
+print (a==b).sum()
