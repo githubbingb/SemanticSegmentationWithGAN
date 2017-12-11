@@ -57,7 +57,7 @@ class Deeplab(nn.Module):
             nn.ReLU(True),
             nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
         )
-        self.classifiers1 = nn.Sequential(
+        self.fc8_1 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6),
             nn.ReLU(True),
             nn.Dropout(0.5, True),
@@ -68,7 +68,7 @@ class Deeplab(nn.Module):
 
             nn.Conv2d(1024, self.n_classes, kernel_size=1),
         )
-        self.classifiers2 = nn.Sequential(
+        self.fc8_2 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=12, dilation=12),
             nn.ReLU(True),
             nn.Dropout(0.5, True),
@@ -79,7 +79,7 @@ class Deeplab(nn.Module):
 
             nn.Conv2d(1024, self.n_classes, kernel_size=1),
         )
-        self.classifiers3 = nn.Sequential(
+        self.fc8_3 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=18, dilation=18),
             nn.ReLU(True),
             nn.Dropout(0.5, True),
@@ -90,7 +90,7 @@ class Deeplab(nn.Module):
 
             nn.Conv2d(1024, self.n_classes, kernel_size=1),
         )
-        self.classifiers4 = nn.Sequential(
+        self.fc8_4 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=24, dilation=24),
             nn.ReLU(True),
             nn.Dropout(0.5, True),
@@ -103,36 +103,18 @@ class Deeplab(nn.Module):
         )
 
     def forward(self, inputs):
-        features = self.features(inputs)
-        outputs = self.classifiers1(features) + self.classifiers2(features) + self.classifiers3(features) + self.classifiers4(features)
+        outputs = self.fc8_1(inputs) + self.fc8_2(inputs) + self.fc8_3(inputs) + self.fc8_4(inputs)
+        # utputs = self.fc8
         return outputs
 
-
-def weights_init(m):
-    classname = m.__class__.__name__
-    if classname.find('Conv') != -1:
-        nn.init.xavier_normal(m.weight.data)
-        nn.init.constant(m.bias.data, 0)
+reader = Reader('/media/Disk/wangfuyu/data/cxr/801/', '/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/trainJM.txt')
 
 def main():
-    reader = Reader('/media/Disk/wangfuyu/data/cxr/801/',
-                    '/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/trainJM.txt')
+
+    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
 
     model = Deeplab(2)
-    model.apply(weights_init)
-
-    keys = model.state_dict().keys()
-
-    print model, keys
-
-    pretrain_dict = np.load('/media/Disk/wangfuyu/voc12.npy').item()
-    print pretrain_dict.keys()
-
-    for key in keys:
-        if key in pretrain_dict.keys():
-            print key
-            model.state_dict()[key] = torch.from_numpy(pretrain_dict[key]).float()
-
+    model.load_state_dict('init.pkl')
     mceLoss = nn.CrossEntropyLoss()
 
     model.cuda()
@@ -145,12 +127,12 @@ def main():
         # label_onehot = torch.FloatTensor([onehot_encoder(label1.numpy()) for label1 in label])
 
         imgs = Variable(torch.from_numpy(images).float().cuda())
-        gts = Variable(torch.from_numpy(ground_truths).long().cuda())
+        gts = Variable(torch.from_numpy(ground_truths).float().cuda())
 
         model.zero_grad()
         pred_map = model(imgs)
         loss = mceLoss(pred_map, gts)
-        loss.backward()
+        loss.bachward()
         optimizer.step()
 
         print loss
