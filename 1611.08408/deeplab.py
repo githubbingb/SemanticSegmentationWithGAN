@@ -107,10 +107,13 @@ class Deeplab(nn.Module):
         # utputs = self.fc8
         return outputs
 
-reader = Reader('/media/Disk/work/JM', '/media/Disk/work/odd_id.txt')
+reader = Reader('/media/Disk/wangfuyu/data/cxr/801/', '/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/trainJM.txt')
 
 def main():
-    model = Deeplab(21)
+
+    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+
+    model = Deeplab(2)
     model.load_state_dict('init.pkl')
     mceLoss = nn.CrossEntropyLoss()
 
@@ -133,6 +136,9 @@ def main():
         optimizer.step()
 
         print loss
+        
+        if step % 1000 == 0:
+            torch.save(model.state_dict(), 'step_%d.pth' % step)
 
 
 
