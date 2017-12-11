@@ -127,15 +127,12 @@ def weights_init(m):
 def accuracy(preds, targets):
     preds = preds.data.cpu().numpy()
     targets = targets.data.cpu().numpy()
-    print preds.shape
     batch = preds.shape[0]
 
     results = 0
     for i in xrange(batch):
         pred = np.array(preds[i,:,:,:])
         target = np.array(targets[i,:,:])
-
-        print pred.shape, target.shape
         pred = np.argmax(pred, axis=0)
 
         results += (pred == target).sum()
