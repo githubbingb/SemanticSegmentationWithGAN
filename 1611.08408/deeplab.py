@@ -56,6 +56,17 @@ class Deeplab(nn.Module):
             nn.Conv2d(512, 512, kernel_size=3, padding=2, dilation=2),
             nn.ReLU(True),
             nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
+
+            nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6),
+            nn.ReLU(True),
+            nn.Dropout(0.5, True),
+
+            nn.Conv2d(1024, 1024, kernel_size=1),
+            nn.ReLU(True),
+            nn.Dropout(0.5, True),
+
+            nn.Conv2d(1024, self.n_classes, kernel_size=1),
+
         )
         self.classifiers1 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6),
@@ -104,8 +115,8 @@ class Deeplab(nn.Module):
 
     def forward(self, inputs):
         features = self.features(inputs)
-        outputs = self.classifiers1(features) + self.classifiers2(features) + self.classifiers3(features) + self.classifiers4(features)
-        return outputs
+        #outputs = self.classifiers1(features) + self.classifiers2(features) + self.classifiers3(features) + self.classifiers4(features)
+        return features
 
 
 def weights_init(m):
