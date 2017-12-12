@@ -18,6 +18,7 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
 max_step = 20000
 
+
 class Deeplab(nn.Module):
     def __init__(self, n_classes):
         super(Deeplab, self).__init__()
@@ -161,7 +162,7 @@ class Deeplab(nn.Module):
             nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
         )
 
-        self.classifiers1 = nn.Sequential(
+        self.fc1 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6),
             nn.ReLU(False),
             nn.Dropout(0.5, False),
@@ -169,10 +170,11 @@ class Deeplab(nn.Module):
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
             nn.Dropout(0.5, False),
-
-            nn.Conv2d(1024, self.n_classes, kernel_size=1),
         )
-        self.classifiers2 = nn.Sequential(
+
+        self.classifiers1 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
+
+        self.fc2 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=12, dilation=12),
             nn.ReLU(False),
             nn.Dropout(0.5, False),
@@ -180,10 +182,10 @@ class Deeplab(nn.Module):
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
             nn.Dropout(0.5, False),
-
-            nn.Conv2d(1024, self.n_classes, kernel_size=1),
         )
-        self.classifiers3 = nn.Sequential(
+        self.classifiers2 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
+
+        self.fc3 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=18, dilation=18),
             nn.ReLU(False),
             nn.Dropout(0.5, False),
@@ -191,10 +193,10 @@ class Deeplab(nn.Module):
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
             nn.Dropout(0.5, False),
-
-            nn.Conv2d(1024, self.n_classes, kernel_size=1),
         )
-        self.classifiers4 = nn.Sequential(
+        self.classifiers3 = nn.Conv2d(1024, self.n_classes, kernel_size=1),
+
+        self.fc4 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=24, dilation=24),
             nn.ReLU(False),
             nn.Dropout(0.5, False),
@@ -202,14 +204,17 @@ class Deeplab(nn.Module):
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
             nn.Dropout(0.5, False),
-
-            nn.Conv2d(1024, self.n_classes, kernel_size=1),
         )
+        self.classifiers4 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
 
     def forward(self, inputs):
         features = self.features(inputs)
-        outputs = self.classifiers1(features) + self.classifiers2(features) \
-                + self.classifiers3(features) + self.classifiers4(features)
+        fc1 = self.fc1(features)
+        fc2 = self.fc2(features)
+        fc3 = self.fc3(features)
+        fc4 = self.fc4(features)
+        outputs = self.classifiers1(fc1) + self.classifiers2(fc2) \
+                + self.classifiers3(fc3) + self.classifiers4(fc4)
         return outputs
 
 
