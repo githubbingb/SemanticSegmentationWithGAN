@@ -307,8 +307,8 @@ def main():
         loss.backward()
         optimizer.step()
 
-        if step % 100 == 0:
-            print 'loss: ', loss, 'acc: ', accuracy(f.softmax(pred_map), gts)
+        if step % 10 == 0:
+            print 'loss: ', loss, 'acc: ', accuracy(f.softmax(pred_map), gts), ground_truths.sum()
 
         if step % 1000 == 0:
             torch.save(model.state_dict(), 'step_%d.pth' % step)
