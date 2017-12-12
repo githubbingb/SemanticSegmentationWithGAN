@@ -10,8 +10,6 @@ from torch.optim.lr_scheduler import LambdaLR
 from torch.autograd import Variable
 import torch.nn.functional as f
 import torchvision
-from DataFolder import MyDataFolder
-from torch.utils.data import DataLoader
 from reader import Reader
 import torch.nn.functional as f
 from collections import OrderedDict
@@ -211,7 +209,7 @@ class Deeplab(nn.Module):
     def forward(self, inputs):
         features = self.features(inputs)
         outputs = self.classifiers1(features) + self.classifiers2(features) \
-                  + self.classifiers3(features) + self.classifiers4(features)
+                + self.classifiers3(features) + self.classifiers4(features)
         return outputs
 
 
