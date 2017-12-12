@@ -9,7 +9,7 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import LambdaLR
 from torch.autograd import Variable
 import torch.nn.functional as f
-import torchvision.transforms as transforms
+import torchvision
 from DataFolder import MyDataFolder
 from torch.utils.data import DataLoader
 from reader import Reader
@@ -24,6 +24,7 @@ class Deeplab(nn.Module):
     def __init__(self, n_classes):
         super(Deeplab, self).__init__()
         self.n_classes = n_classes
+        '''
         self.features = nn.Sequential(OrderedDict([
             ('conv1_1', nn.Conv2d(3, 64, kernel_size=3, padding=1)),
             ('relu1_1', nn.ReLU(False)),
@@ -123,14 +124,94 @@ class Deeplab(nn.Module):
         self.classifiers4 = nn.Sequential(OrderedDict(
             [('fc8_cxr_4', nn.Conv2d(1024, self.n_classes, kernel_size=1)),])
         )
+        '''
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(64, 64, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+
+            nn.Conv2d(64, 128, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+
+            nn.Conv2d(256, 512, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(512, 512, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(512, 512, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
+
+            nn.Conv2d(512, 512, kernel_size=3, padding=2, dilation=2),
+            nn.ReLU(False),
+            nn.Conv2d(512, 512, kernel_size=3, padding=2, dilation=2),
+            nn.ReLU(False),
+            nn.Conv2d(512, 512, kernel_size=3, padding=2, dilation=2),
+            nn.ReLU(False),
+            nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
+        )
+
+        self.classifiers1 = nn.Sequential(
+            nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6),
+            nn.ReLU(False),
+            nn.Dropout(0.5, False),
+
+            nn.Conv2d(1024, 1024, kernel_size=1),
+            nn.ReLU(False),
+            nn.Dropout(0.5, False),
+
+            nn.Conv2d(1024, self.n_classes, kernel_size=1),
+        )
+        self.classifiers2 = nn.Sequential(
+            nn.Conv2d(512, 1024, kernel_size=3, padding=12, dilation=12),
+            nn.ReLU(False),
+            nn.Dropout(0.5, False),
+
+            nn.Conv2d(1024, 1024, kernel_size=1),
+            nn.ReLU(False),
+            nn.Dropout(0.5, False),
+
+            nn.Conv2d(1024, self.n_classes, kernel_size=1),
+        )
+        self.classifiers3 = nn.Sequential(
+            nn.Conv2d(512, 1024, kernel_size=3, padding=18, dilation=18),
+            nn.ReLU(False),
+            nn.Dropout(0.5, False),
+
+            nn.Conv2d(1024, 1024, kernel_size=1),
+            nn.ReLU(False),
+            nn.Dropout(0.5, False),
+
+            nn.Conv2d(1024, self.n_classes, kernel_size=1),
+        )
+        self.classifiers4 = nn.Sequential(
+            nn.Conv2d(512, 1024, kernel_size=3, padding=24, dilation=24),
+            nn.ReLU(False),
+            nn.Dropout(0.5, False),
+
+            nn.Conv2d(1024, 1024, kernel_size=1),
+            nn.ReLU(False),
+            nn.Dropout(0.5, False),
+
+            nn.Conv2d(1024, self.n_classes, kernel_size=1),
+        )
 
     def forward(self, inputs):
         features = self.features(inputs)
-        fc1 = self.fc1(features)
-        fc2 = self.fc2(features)
-        fc3 = self.fc3(features)
-        fc4 = self.fc4(features)
-        outputs = self.classifiers1(fc1) + self.classifiers2(fc2) + self.classifiers3(fc3) + self.classifiers4(fc4)
+        outputs = self.classifiers1(features) + self.classifiers2(features) \
+                  + self.classifiers3(features) + self.classifiers4(features)
         return outputs
 
 
@@ -159,6 +240,8 @@ def accuracy(preds, targets):
         target = np.array(targets[i,:,:])
         pred = np.argmax(pred, axis=0)
 
+        print pred
+
         results += (pred == target).sum()
 
     return results*1.0/batch/preds.shape[1]/preds.shape[2]
@@ -174,18 +257,18 @@ def main():
     model.apply(weights_init)
     model_dict = model.state_dict()
     keys = model_dict.keys()
-
-    model.classifiers4.parameters()
-
     print model, keys
 
-    pretrain_dict = {}
-    voc12_dict = np.load('/media/Disk/wangfuyu/voc12.npy').item()
-    for key in voc12_dict:
-        if key in model_dict:
-            pretrain_dict[key] = torch.from_numpy(voc12_dict[key]).float()
+    # pretrain_dict = {}
+    # voc12_dict = np.load('/media/Disk/wangfuyu/voc12.npy').item()
+    # for key in voc12_dict:
+    #     if key in model_dict:
+    #         pretrain_dict[key] = torch.from_numpy(voc12_dict[key]).float()
 
-    model_dict.update(pretrain_dict)
+    pretrained_dict = torchvision.models.vgg16(pretrained=True)
+    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+
+    model_dict.update(pretrained_dict)
     model.load_state_dict(model_dict)
 
     mceLoss = nn.CrossEntropyLoss()
@@ -194,10 +277,10 @@ def main():
     mceLoss.cuda()
 
     optimizer = optim.SGD([{'params': model.features.parameters()},
-                           {'params': model.fc1.parameters()},
-                           {'params': model.fc2.parameters()},
-                           {'params': model.fc3.parameters()},
-                           {'params': model.fc4.parameters()},
+                           # {'params': model.fc1.parameters()},
+                           # {'params': model.fc2.parameters()},
+                           # {'params': model.fc3.parameters()},
+                           # {'params': model.fc4.parameters()},
                            {'params': model.classifiers1.parameters(), 'lr': 1e-2},
                            {'params': model.classifiers2.parameters(), 'lr': 1e-2},
                            {'params': model.classifiers3.parameters(), 'lr': 1e-2},
