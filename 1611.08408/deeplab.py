@@ -268,11 +268,11 @@ def main():
     #     if key in model_dict:
     #         pretrain_dict[key] = torch.from_numpy(voc12_dict[key]).float()
 
-    pretrained_dict = torchvision.models.vgg16(pretrained=True).state_dict()
-    pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+    # pretrained_dict = torchvision.models.vgg16(pretrained=True).state_dict()
+    # pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
+    # model_dict.update(pretrained_dict)
 
-    model_dict.update(pretrained_dict)
-    model.load_state_dict(model_dict)
+    model.load_state_dict(torch.load('/media/Disk/wangfuyu/init.pth'))
 
     mceLoss = nn.CrossEntropyLoss()
 
@@ -280,10 +280,10 @@ def main():
     mceLoss.cuda()
 
     optimizer = optim.SGD([{'params': model.features.parameters()},
-                           # {'params': model.fc1.parameters()},
-                           # {'params': model.fc2.parameters()},
-                           # {'params': model.fc3.parameters()},
-                           # {'params': model.fc4.parameters()},
+                           {'params': model.fc1.parameters()},
+                           {'params': model.fc2.parameters()},
+                           {'params': model.fc3.parameters()},
+                           {'params': model.fc4.parameters()},
                            {'params': model.classifiers1.parameters(), 'lr': 1e-2},
                            {'params': model.classifiers2.parameters(), 'lr': 1e-2},
                            {'params': model.classifiers3.parameters(), 'lr': 1e-2},

@@ -39,7 +39,7 @@ class Reader():
             gt_interp = cv2.resize(gt, ((img.shape[0]-1)/8+1, (img.shape[1]-1)/8+1), cv2.INTER_LINEAR)
             ground_truths_interp[:, :, i] = gt_interp
 
-            # print self.filelist[self.index + i]
+            print self.filelist[self.index + i]
 
         self.index += self.batchsize
         images = images.transpose((3, 2, 0, 1))

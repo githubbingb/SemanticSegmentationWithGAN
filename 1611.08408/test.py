@@ -1,77 +1,163 @@
-import torch
-import numpy as np
-import torchvision
-
-#
-# input = torch.FloatTensor(1,3,5,5)
-# label_map = torch.FloatTensor(1,8,5,5)
-#
-# b = input[:, 0, :, :].repeat(1,label_map.size()[1], 1, 1)
-# g = input[:, 1, :, :].repeat(1, label_map.size()[1], 1, 1)
-# r = input[:, 2, :, :].repeat(1, label_map.size()[1], 1, 1)
-#
-# product_b = label_map * b
-# product_g = label_map * g
-# product_r = label_map * r
-#
-# output = torch.cat((product_b, product_g, product_r), dim=1)
-#
-# print output.size()
-#
-# for index, c in enumerate(range(0, 2)):
-#     print index
-#
-# a = np.array([1,2,3])
-# b= np.array([2,1,2])
-# print a>b
-#
 # import numpy as np
-# import cv2
 # import os
-# from matplotlib import pyplot as plt
-#
-# GT_root = '/media/Disk/work/vision/800/JM/masks/'
-# pred_root = '/media/Disk/work/vision/deeplab_vgg16/'
-#
-#
-# def set_conf(y_true, y_pred):
-#     y_true_f = y_true.flatten()
-#     y_pred_f = y_pred.flatten()
-#
-#     for i in xrange(len(y_true_f)):
-#         conf[y_true_f[i], y_pred_f[i]] += 1
-#
-#
-# for root, dirnames, filenames in os.walk(pred_root):
-#     for filename in filenames:
-#         gt = cv2.imread(os.path.join(GT_root, filename), flags=cv2.IMREAD_GRAYSCALE)
-#         pred = cv2.imread(os.path.join(pred_root, filename), flags=cv2.IMREAD_GRAYSCALE)
-#         _, pred = cv2.threshold(pred, 1, 1, 0)
-#
-#         missing = (gt > pred).astype(float)
-#         redundant = (gt < pred).astype(float)
-#
-#         diff = cv2.bitwise_xor(pred, gt)
-#
-#         print filename
-#         plt.figure(figsize=(20, 20))
-#         plt.subplot(3, 2, 1)
-#         plt.title('gt')
-#         plt.imshow(gt)
-#         plt.subplot(3, 2, 2)
-#         plt.title('pred')
-#         plt.imshow(pred)
-#         plt.subplot(3, 2, 3)
-#         plt.title('missing')
-#         plt.imshow(missing)
-#         plt.subplot(3, 2, 4)
-#         plt.title('redundant')
-#         plt.imshow(redundant)
-#         plt.subplot(3, 2, 5)
-#         plt.title('diff')
-#         plt.imshow(diff)
-#         plt.show()
+# import argparse
+# import random
+# import torch
+# import torch.nn as nn
+# import torch.backends.cudnn as cudnn
+# import torch.optim as optim
+# from torch.autograd import Variable
+# import torch.nn.functional as f
+# import torchvision.transforms as transforms
+# from torch.utils.data import DataLoader
+# import torchvision.models as models
+# import torch.nn.functional as f
+# from collections import OrderedDict
 
-model = torchvision.models.vgg16(pretrained=True)
+# lr = 1e-3
 
-print model.state_dict().keys()
+# class Deeplab(nn.Module):
+#     def __init__(self, n_classes):
+#         super(Deeplab, self).__init__()
+#         self.n_classes = n_classes
+#         self.features = nn.Sequential(OrderedDict([
+#             ('conv1_1', nn.Conv2d(3, 64, kernel_size=3, padding=1)),
+#             ('relu1_1', nn.ReLU(False)),
+#             ('conv1_2', nn.Conv2d(64, 64, kernel_size=3, padding=1)),
+#             ('relu1_2', nn.ReLU(False)),
+#             ('pool1', nn.MaxPool2d(kernel_size=3, stride=2, padding=1)),
+
+#             ('conv2_1', nn.Conv2d(64, 128, kernel_size=3, padding=1)),
+#             ('relu2_1', nn.ReLU(False)),
+#             ('conv2_2', nn.Conv2d(128, 128, kernel_size=3, padding=1)),
+#             ('relu2_2', nn.ReLU(False)),
+#             ('pool2', nn.MaxPool2d(kernel_size=3, stride=2, padding=1)),
+
+#             ('conv3_1', nn.Conv2d(128, 256, kernel_size=3, padding=1)),
+#             ('relu3_1', nn.ReLU(False)),
+#             ('conv3_2', nn.Conv2d(256, 256, kernel_size=3, padding=1)),
+#             ('relu3_2', nn.ReLU(False)),
+#             ('conv3_3', nn.Conv2d(256, 256, kernel_size=3, padding=1)),
+#             ('relu3_3', nn.ReLU(False)),
+#             ('pool3', nn.MaxPool2d(kernel_size=3, stride=2, padding=1)),
+
+#             ('conv4_1', nn.Conv2d(256, 512, kernel_size=3, padding=1)),
+#             ('relu4_1', nn.ReLU(False)),
+#             ('conv4_2', nn.Conv2d(512, 512, kernel_size=3, padding=1)),
+#             ('relu4_2', nn.ReLU(False)),
+#             ('conv4_3', nn.Conv2d(512, 512, kernel_size=3, padding=1)),
+#             ('relu4_3', nn.ReLU(False)),
+#             ('pool4', nn.MaxPool2d(kernel_size=3, stride=1, padding=1)),
+
+#             ('conv5_1', nn.Conv2d(512, 512, kernel_size=3, padding=2, dilation=2)),
+#             ('relu5_1', nn.ReLU(False)),
+#             ('conv5_2', nn.Conv2d(512, 512, kernel_size=3, padding=2, dilation=2)),
+#             ('relu5_2', nn.ReLU(False)),
+#             ('conv5_3', nn.Conv2d(512, 512, kernel_size=3, padding=2, dilation=2)),
+#             ('relu5_3', nn.ReLU(False)),
+#             ('pool5', nn.MaxPool2d(kernel_size=3, stride=1, padding=1)),
+#             ])
+#         )
+
+
+#         self.fc1 = nn.Sequential(OrderedDict(
+#             [('fc6_1', nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6)),
+#              ('relu6_1', nn.ReLU(False)),
+#              ('dropout6_1', nn.Dropout(0.5, False)),
+
+#              ('fc7_1', nn.Conv2d(1024, 1024, kernel_size=1)),
+#              ('relu7_1', nn.ReLU(False)),
+#              ('dropout7_1', nn.Dropout(0.5, False)),
+#              ])
+#         )
+
+#         self.classifiers1 = nn.Sequential(OrderedDict(
+#             [('fc8_cxr_2', nn.Conv2d(1024, self.n_classes, kernel_size=1)),])
+#         )
+
+#         self.fc2 = nn.Sequential(OrderedDict(
+#             [('fc6_2', nn.Conv2d(512, 1024, kernel_size=3, padding=12, dilation=12)),
+#              ('relu6_2', nn.ReLU(False)),
+#              ('dropout6_2', nn.Dropout(0.5, False)),
+
+#              ('fc7_2', nn.Conv2d(1024, 1024, kernel_size=1)),
+#              ('relu7_2', nn.ReLU(False)),
+#              ('dropout7_2', nn.Dropout(0.5, False)),
+#              ])
+#         )
+
+#         self.classifiers2 = nn.Sequential(OrderedDict(
+#             [('fc8_cxr_2', nn.Conv2d(1024, self.n_classes, kernel_size=1)),])
+#         )
+
+#         self.fc3 = nn.Sequential(OrderedDict(
+#             [('fc6_3', nn.Conv2d(512, 1024, kernel_size=3, padding=16, dilation=16)),
+#              ('relu6_3', nn.ReLU(False)),
+#              ('dropout6_3', nn.Dropout(0.5, False)),
+
+#              ('fc7_3', nn.Conv2d(1024, 1024, kernel_size=1)),
+#              ('relu7_3', nn.ReLU(False)),
+#              ('dropout7_3', nn.Dropout(0.5, False)),
+#              ])
+#         )
+
+#         self.classifiers3 = nn.Sequential(OrderedDict(
+#             [('fc8_cxr_3', nn.Conv2d(1024, self.n_classes, kernel_size=1)),])
+#         )
+
+#         self.fc4 = nn.Sequential(OrderedDict(
+#             [('fc6_4', nn.Conv2d(512, 1024, kernel_size=3, padding=24, dilation=24)),
+#              ('relu6_4', nn.ReLU(False)),
+#              ('dropout6_4', nn.Dropout(0.5, False)),
+
+#              ('fc7_4', nn.Conv2d(1024, 1024, kernel_size=1)),
+#              ('relu7_4', nn.ReLU(False)),
+#              ('dropout7_4', nn.Dropout(0.5, False)),
+#              ])
+#         )
+
+#         self.classifiers4 = nn.Sequential(OrderedDict(
+#             [('fc8_cxr_4', nn.Conv2d(1024, self.n_classes, kernel_size=1)),])
+#         )
+
+#     def forward(self, inputs):
+#         features = self.features(inputs)
+#         fc1 = self.fc1(features)
+#         fc2 = self.fc2(features)
+#         fc3 = self.fc3(features)
+#         fc4 = self.fc4(features)
+#         outputs = self.classifiers1(fc1) + self.classifiers2(fc2) + self.classifiers3(fc3) + self.classifiers4(fc4)
+#         return outputs
+
+# model = Deeplab(2)
+# print model.state_dict().keys()
+# optimizer = optim.SGD([{'params': model.features.parameters()},
+#                            {'params': model.fc1.parameters()},
+#                            {'params': model.fc2.parameters()},
+#                            {'params': model.fc3.parameters()},
+#                            {'params': model.fc4.parameters()},
+#                            {'params': model.classifiers1.parameters(), 'lr': 1e-2},
+#                            {'params': model.classifiers2.parameters(), 'lr': 1e-2},
+#                            {'params': model.classifiers3.parameters(), 'lr': 1e-2},
+#                            {'params': model.classifiers4.parameters(), 'lr': 1e-2},
+#                            ], lr=1e-3, momentum=0.9, weight_decay=5e-4)
+
+# for param_group in optimizer.param_groups:
+#     print param_group.keys(), param_group['lr']
+
+from reader import Reader
+import torch
+
+batsize = 1
+reader = Reader('/media/Disk/wangfuyu/data/cxr/801',
+                '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=batsize)
+
+for step in range(3000):
+    # adjust_learning_rate(optimizer, decay_rate=0.9, step=step)
+    images, ground_truths = reader.next()
+    print step
+    imgs = torch.from_numpy(images).float()
+    gts = torch.from_numpy(ground_truths).long()
+    print images, ground_truths, ground_truths >= 1
+
+
