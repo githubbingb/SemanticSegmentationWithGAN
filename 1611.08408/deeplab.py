@@ -159,7 +159,7 @@ class Deeplab(nn.Module):
             nn.ReLU(False),
             nn.Conv2d(512, 512, kernel_size=3, padding=2, dilation=2),
             nn.ReLU(False),
-            nn.MaxPool2d(kernel_size=3, stride=1, padding=1),
+            nn.MaxPool2d(kernel_size=3, stride=1, padding=1)
         )
 
         self.fc1 = nn.Sequential(
@@ -169,7 +169,7 @@ class Deeplab(nn.Module):
 
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
-            nn.Dropout(0.5, False),
+            nn.Dropout(0.5, False)
         )
 
         self.classifiers1 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
@@ -181,7 +181,7 @@ class Deeplab(nn.Module):
 
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
-            nn.Dropout(0.5, False),
+            nn.Dropout(0.5, False)
         )
         self.classifiers2 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
 
@@ -192,9 +192,9 @@ class Deeplab(nn.Module):
 
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
-            nn.Dropout(0.5, False),
+            nn.Dropout(0.5, False)
         )
-        self.classifiers3 = nn.Conv2d(1024, self.n_classes, kernel_size=1),
+        self.classifiers3 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
 
         self.fc4 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=24, dilation=24),
@@ -203,7 +203,7 @@ class Deeplab(nn.Module):
 
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
-            nn.Dropout(0.5, False),
+            nn.Dropout(0.5, False)
         )
         self.classifiers4 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
 
