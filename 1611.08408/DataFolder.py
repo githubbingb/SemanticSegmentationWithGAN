@@ -38,20 +38,10 @@ class MyDataFolder(data.Dataset):
             img = self.transform(img)
             label = self.transform(label)
             label_interp = self.transform(label_interp)
-        return img, label_interp
+        return img, label
 
     def __len__(self):
         return len(self.img_list)
 
-    # def onehot_encoder(self, label):
-    #     for index, c in enumerate(range(0, self.n_classes)):
-    #         onehot = np.array(label)
-    #         mask = (onehot == c)
-    #         mask = np.reshape(mask, (1, mask.shape[0], mask.shape[1]))
-    #
-    #         if index == 0:
-    #             onehot = mask
-    #         else:
-    #             onehot = np.concatenate(onehot, mask)
-    #
-    #         return onehot.astype(np.float32)
+
+data =

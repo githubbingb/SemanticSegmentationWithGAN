@@ -36,6 +36,7 @@ class Reader():
 
             gt = cv2.imread(os.path.join(self.data_root, 'masks', self.filelist[self.index + i] + '.png'),
                             cv2.IMREAD_GRAYSCALE)
+            print gt.shape
             gt_interp = cv2.resize(gt, ((img.shape[0]-1)/8+1, (img.shape[1]-1)/8+1), cv2.INTER_LINEAR)
             ground_truths_interp[:, :, i] = gt_interp
 

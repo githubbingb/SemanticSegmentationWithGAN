@@ -303,6 +303,8 @@ def main():
         imgs = Variable(torch.from_numpy(images).float()).cuda()
         gts = Variable(torch.from_numpy(ground_truths).long()).cuda()
 
+        print gts.data.size(), imgs.data.size()
+
         model.zero_grad()
         pred_map = model(imgs)
         loss = mceLoss(pred_map, gts)
