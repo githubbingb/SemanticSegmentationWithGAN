@@ -225,6 +225,10 @@ class Deeplab(nn.Module):
         print 'fc2', fc2
         print 'fc3', fc3
         print 'fc4', fc4
+        print 'cl1', cl1
+        print 'cl2', cl2
+        print 'cl3', cl3
+        print 'cl4', cl4
 
         return outputs
 
