@@ -16,6 +16,8 @@ from collections import OrderedDict
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
+cudnn.benchmark = True
+
 max_step = 20000
 
 
@@ -274,7 +276,7 @@ def main():
 
     model.load_state_dict(torch.load('/media/Disk/wangfuyu/init.pth'))
 
-    mceLoss = nn.CrossEntropyLoss()
+    mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
     model.cuda()
     mceLoss.cuda()
@@ -298,8 +300,8 @@ def main():
         # adjust_learning_rate(optimizer, decay_rate=0.9, step=step)
         images, ground_truths = reader.next()
 
-        imgs = Variable(torch.from_numpy(images).float().cuda())
-        gts = Variable(torch.from_numpy(ground_truths).long().cuda())
+        imgs = Variable(torch.from_numpy(images).float()).cuda()
+        gts = Variable(torch.from_numpy(ground_truths).long()).cuda()
 
         model.zero_grad()
         pred_map = model(imgs)
@@ -308,7 +310,7 @@ def main():
         optimizer.step()
 
         if step % 10 == 0:
-            print 'loss: ', loss, 'acc: ', accuracy(f.softmax(pred_map), gts), ground_truths.sum()
+            print 'loss: ', loss, 'acc: ', accuracy(pred_map, gts), ground_truths.sum()
 
         if step % 1000 == 0:
             torch.save(model.state_dict(), 'step_%d.pth' % step)

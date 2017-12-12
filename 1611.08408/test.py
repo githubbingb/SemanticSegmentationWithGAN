@@ -149,15 +149,17 @@ from reader import Reader
 import torch
 
 batsize = 1
-reader = Reader('/media/Disk/wangfuyu/data/cxr/801',
-                '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=batsize)
+reader = Reader('/media/Disk/work//801',
+                '/media/Disk/work/801/trainJM.txt', batchsize=batsize)
 
 for step in range(3000):
     # adjust_learning_rate(optimizer, decay_rate=0.9, step=step)
     images, ground_truths = reader.next()
-    print step
-    imgs = torch.from_numpy(images).float()
-    gts = torch.from_numpy(ground_truths).long()
-    print images, ground_truths, ground_truths >= 1
+    # print step
+    # imgs = torch.from_numpy(images).float()
+    # gts = torch.from_numpy(ground_truths).long()
+    temp1 = ground_truths == 255
+    temp2 = ground_truths > 0.9
+    print temp1.sum()
 
 
