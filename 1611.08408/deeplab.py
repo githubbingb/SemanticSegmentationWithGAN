@@ -234,27 +234,27 @@ def weights_init(m):
         nn.init.constant(m.bias.data, 0)
 
 
-def accuracy(preds, targets):
-    preds = preds.data.cpu().numpy()
-    targets = targets.data.cpu().numpy()
-    batch = preds.shape[0]
+def _fast_hist(label_pred, label_true, num_classes):
+    mask = (label_true >= 0) & (label_true < num_classes)
+    hist = np.bincount(
+        num_classes * label_true[mask].astype(int) +
+        label_pred[mask], minlength=num_classes ** 2).reshape(num_classes, num_classes)
+    return hist
 
-    results = 0
-    for i in xrange(batch):
-        pred = np.array(preds[i,:,:,:])
-        target = np.array(targets[i,:,:])
-        pred = np.argmax(pred, axis=0)
+def evaluate(predictions, gts, num_classes):
+    hist = np.zeros((num_classes, num_classes))
+    for lp, lt in zip(predictions, gts):
+        hist += _fast_hist(lp.flatten(), lt.flatten(), num_classes)
+    # axis 0: gt, axis 1: prediction
+    acc = np.diag(hist).sum() / hist.sum()
+    acc_cls = np.diag(hist) / hist.sum(axis=1)
+    acc_cls = np.nanmean(acc_cls)
 
-        print pred
-
-        results += (pred == target).sum()
-
-    return results*1.0/batch/preds.shape[1]/preds.shape[2]
-
+    return acc, acc_cls
 
 def main():
 
-    batsize = 2
+    batsize = 1
     reader = Reader('/media/Disk/wangfuyu/data/cxr/801/',
                 '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=batsize)
 
@@ -310,7 +310,12 @@ def main():
         optimizer.step()
 
         if step % 10 == 0:
-            print 'loss: ', loss, 'acc: ', accuracy(pred_map, gts), ground_truths.sum()
+            print 'loss: ', loss, 'acc: '
+
+            preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
+            masks = gts.data.squeeze_(0).cpu().numpy()
+            acc, acc_class = evaluate(preds, gts, 2)
+            print  acc, acc_class
 
         if step % 1000 == 0:
             torch.save(model.state_dict(), 'step_%d.pth' % step)
