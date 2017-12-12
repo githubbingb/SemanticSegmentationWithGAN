@@ -215,8 +215,17 @@ class Deeplab(nn.Module):
         fc2 = self.fc2(features)
         fc3 = self.fc3(features)
         fc4 = self.fc4(features)
-        outputs = self.classifiers1(fc1) + self.classifiers2(fc2) \
-                + self.classifiers3(fc3) + self.classifiers4(fc4)
+        cl1 = self.classifiers1(fc1)
+        cl2 = self.classifiers2(fc2)
+        cl3 = self.classifiers2(fc3)
+        cl4 = self.classifiers2(fc4)
+        outputs = cl1 + cl2 + cl3 + cl4
+
+        print 'fc1', fc1
+        print 'fc2', fc2
+        print 'fc3', fc3
+        print 'fc4', fc4
+
         return outputs
 
 
@@ -258,8 +267,8 @@ def main():
     reader = Reader('/media/Disk/wangfuyu/data/cxr/801/',
                 '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=batsize)
 
-    model = Deeplab(2)
-    model.apply(weights_init)
+    model = Deeplab(n_classes=2)
+    # model.apply(weights_init)
     model_dict = model.state_dict()
     keys = model_dict.keys()
     print model, keys
@@ -314,10 +323,10 @@ def main():
         if step % 10 == 0:
             print 'loss: ', loss, 'acc: '
 
-            preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
-            masks = gts.data.squeeze_(0).cpu().numpy()
-            acc, acc_class = evaluate(preds, masks, 2)
-            print  acc, acc_class
+            # preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
+            # masks = gts.data.squeeze_(0).cpu().numpy()
+            # acc, acc_class = evaluate(preds, masks, 2)
+            # print  acc, acc_class
 
         if step % 1000 == 0:
             torch.save(model.state_dict(), 'step_%d.pth' % step)

@@ -44,4 +44,3 @@ class MyDataFolder(data.Dataset):
         return len(self.img_list)
 
 
-data =

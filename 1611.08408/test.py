@@ -168,7 +168,8 @@ import torch
 
 loss = torch.nn.CrossEntropyLoss()
 input = torch.autograd.Variable(torch.randn(3, 3, 5, 5), requires_grad=True)
-target = torch.autograd.Variable(torch.LongTensor(3, 5, 5).random_(5))
+target = torch.autograd.Variable(torch.LongTensor(3, 5, 5).random_(3))
 output = loss(input, target)
+print output
 output.backward()
 print input.data.size(), target.data.size()
