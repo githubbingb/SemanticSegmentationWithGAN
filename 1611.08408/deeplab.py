@@ -288,6 +288,7 @@ def main():
     # model_dict.update(pretrained_dict)
 
     model.load_state_dict(torch.load('/media/Disk/wangfuyu/init.pth'))
+    print model_dict
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
@@ -310,6 +311,8 @@ def main():
     # scheduler = LambdaLR(optimizer, lr_lambda=[lambda1, lambda2])
 
     for step in range(max_step):
+        print 'parameters: '
+        print model_dict['classifiers1'].weight.data, model_dict['classifiers1'].bias.data
         # adjust_learning_rate(optimizer, decay_rate=0.9, step=step)
         images, ground_truths = reader.next()
 
