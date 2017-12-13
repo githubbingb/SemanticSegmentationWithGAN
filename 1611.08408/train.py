@@ -157,7 +157,6 @@ def main():
 
     G.cuda()
     D.cuda()
-    bceLoss.cuda()
     mceLoss.cuda()
         # input, ground_truth, label = input.cuda(), ground_truth.cuda(), label.cuda()
 
