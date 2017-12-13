@@ -12,12 +12,11 @@ from DataFolder import MyDataFolder
 from torch.utils.data import DataLoader
 from reader import Reader
 import numpy as np
-
-import cv2
-
-
-
 from models import Generator, Discriminator
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+
+
 
 # parser = argparse.ArgumentParser()
 # parser.add_argument('--dataset', required=True, help='cifar10 | lsun | imagenet | folder | lfw | fake')
