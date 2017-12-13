@@ -178,7 +178,7 @@ def main():
         # label_onehot = torch.FloatTensor([onehot_encoder(label1.numpy()) for label1 in label])
 
         imgs = Variable(torch.from_numpy(images).float().cuda())
-        gts = Variable(torch.from_numpy(ground_truths).float().cuda())
+        gts = Variable(torch.from_numpy(ground_truths).long().cuda())
         real_label = Variable(torch.ones(1).long().cuda())
         fake_label = Variable(torch.zeros(1).long().cuda())
 
