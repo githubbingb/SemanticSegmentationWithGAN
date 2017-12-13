@@ -146,7 +146,7 @@ def main():
 
     print D, G
 
-    bceLoss = nn.BCELoss()
+    # bceLoss = nn.BCELoss()
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
     # input = torch.FloatTensor(opt.batchSize, 3, opt.imageSize, opt.imageSize)
@@ -189,13 +189,13 @@ def main():
         # x_fake = product(Interp(inputv), f.softmax(pred_map))
         x_fake = f.softmax(pred_map)
         y_fake = D(x_fake.detach())
-        DLoss_fake = bceLoss(f.sigmoid(y_fake), fake_label)
+        DLoss_fake = y_real(y_fake, fake_label)
         DLoss_fake.backward()
 
         #x_real = product(Interp(inputv), one_hot(ground_truthv))
         x_real = Variable(torch.from_numpy(onehot_encoder(ground_truths)).long().cuda())
         y_real = D(x_real)
-        DLoss_real = bceLoss(f.sigmoid(y_real), real_label)
+        DLoss_real = mceLoss(y_real, real_label)
         DLoss_real.backward()
 
         optimizerD.step()
@@ -206,7 +206,7 @@ def main():
         #x_fake = product(inputv,  f.softmax(pred_map))
         #x_fake = f.softmax(pred_map)
         y_fake = D(x_fake)
-        GLoss = mceLoss(pred_map, gts) + bceLoss(y_fake, real_label)
+        GLoss = mceLoss(pred_map, gts) + mceLoss(y_fake, real_label)
         GLoss.bachward()
         optimizerG.step()
 

@@ -138,7 +138,7 @@ class Discriminator(nn.Module):
         outputs = self.features(inputs)
         outputs = f.avg_pool2d(outputs, kernel_size=outputs.size()[2])
 
-        return outputs.view(-1,1).squeeze(1)
+        return outputs.view(-1,2)
 
 
 
