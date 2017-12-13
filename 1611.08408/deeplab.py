@@ -274,7 +274,7 @@ def main():
 
     model = Deeplab(n_classes=2)
     model.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/init.pth'))
-
+    model.apply(weights_init())
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
