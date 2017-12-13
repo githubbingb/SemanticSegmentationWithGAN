@@ -221,14 +221,14 @@ class Deeplab(nn.Module):
         cl4 = self.classifiers2(fc4)
         outputs = cl1 + cl2 + cl3 + cl4
 
-        # print 'fc1', fc1
-        # print 'fc2', fc2
-        # print 'fc3', fc3
-        # print 'fc4', fc4
-        # print 'cl1', cl1
-        # print 'cl2', cl2
-        # print 'cl3', cl3
-        # print 'cl4', cl4
+        print 'fc1', fc1
+        print 'fc2', fc2
+        print 'fc3', fc3
+        print 'fc4', fc4
+        print 'cl1', cl1
+        print 'cl2', cl2
+        print 'cl3', cl3
+        print 'cl4', cl4
 
         return outputs
 
@@ -244,8 +244,8 @@ def weights_init(m):
         print m.weight.data
         # nn.init.xavier_normal(m.weight.data)
         # nn.init.constant(m.bias.data, 0)
-        nn.init.normal(m.weight.data, mean=0, std=0.01)
-        nn.init.constant(m.bias.data, 0)
+        # nn.init.normal(m.weight.data, mean=0, std=0.01)
+        # nn.init.constant(m.bias.data, 0)
 
 
 def _fast_hist(label_pred, label_true, num_classes):
@@ -274,7 +274,7 @@ def main():
 
     model = Deeplab(n_classes=2)
     model.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/init.pth'))
-    model.apply(weights_init)
+
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
