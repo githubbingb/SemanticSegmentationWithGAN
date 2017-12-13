@@ -221,14 +221,14 @@ class Deeplab(nn.Module):
         cl4 = self.classifiers2(fc4)
         outputs = cl1 + cl2 + cl3 + cl4
 
-        print 'fc1', fc1
-        print 'fc2', fc2
-        print 'fc3', fc3
-        print 'fc4', fc4
-        print 'cl1', cl1
-        print 'cl2', cl2
-        print 'cl3', cl3
-        print 'cl4', cl4
+        # print 'fc1', fc1
+        # print 'fc2', fc2
+        # print 'fc3', fc3
+        # print 'fc4', fc4
+        # print 'cl1', cl1
+        # print 'cl2', cl2
+        # print 'cl3', cl3
+        # print 'cl4', cl4
 
         return outputs
 
@@ -305,8 +305,6 @@ def main():
 
         imgs = Variable(torch.from_numpy(images).float()).cuda()
         gts = Variable(torch.from_numpy(ground_truths).long()).cuda()
-
-        print gts.data.size(), imgs.data.size()
 
         model.zero_grad()
         pred_map = model(imgs)
