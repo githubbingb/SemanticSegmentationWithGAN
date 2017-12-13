@@ -111,7 +111,7 @@ def onehot_encoder(ground_truth):
 
         outputs[i, :, :, :] = onehot
 
-    return outputs
+    return outputs.astype(float)
 
 
 def _fast_hist(label_pred, label_true, num_classes):
