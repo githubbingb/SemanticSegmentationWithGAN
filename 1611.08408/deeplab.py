@@ -316,10 +316,10 @@ def main():
         if step % 10 == 0:
             print 'loss: ', loss, 'acc: '
 
-            # preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
-            # masks = gts.data.squeeze_(0).cpu().numpy()
-            # acc, acc_class = evaluate(preds, masks, 2)
-            # print  acc, acc_class
+            preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
+            masks = gts.data.squeeze_(0).cpu().numpy()
+            acc, acc_class = evaluate(preds, masks, 2)
+            print  acc, acc_class
 
         if step % 1000 == 0:
             torch.save(model.state_dict(), 'step_%d.pth' % step)
