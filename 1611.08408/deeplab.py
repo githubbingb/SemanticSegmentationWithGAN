@@ -273,24 +273,8 @@ def main():
                 '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=batsize)
 
     model = Deeplab(n_classes=2)
-    
-    model_dict = model.state_dict()
-    keys = model_dict.keys()
-    print model, keys
+    model.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/init.pth'))
 
-    # pretrain_dict = {}
-    # voc12_dict = np.load('/media/Disk/wangfuyu/voc12.npy').item()
-    # for key in voc12_dict:
-    #     if key in model_dict:
-    #         pretrain_dict[key] = torch.from_numpy(voc12_dict[key]).float()
-
-    # pretrained_dict = torchvision.models.vgg16(pretrained=True).state_dict()
-    # pretrained_dict = {k: v for k, v in pretrained_dict.items() if k in model_dict}
-    # model_dict.update(pretrained_dict)
-
-    model.load_state_dict(torch.load('/media/Disk/wangfuyu/init.pth'))
-    # print model_dict, model_dict['features.0.weight'].data
-    model.apply(weights_init)
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
