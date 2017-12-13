@@ -241,6 +241,7 @@ def adjust_learning_rate(optimizer, decay_rate=0.9, step=0):
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
+        print m.weight.data
         # nn.init.xavier_normal(m.weight.data)
         # nn.init.constant(m.bias.data, 0)
         nn.init.normal(m.weight.data, mean=0, std=0.01)
@@ -272,7 +273,7 @@ def main():
                 '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=batsize)
 
     model = Deeplab(n_classes=2)
-    # model.apply(weights_init)
+    model.apply(weights_init)
     model_dict = model.state_dict()
     keys = model_dict.keys()
     print model, keys
@@ -288,7 +289,7 @@ def main():
     # model_dict.update(pretrained_dict)
 
     model.load_state_dict(torch.load('/media/Disk/wangfuyu/init.pth'))
-    print model_dict, model_dict['features.0.weight'].data
+    # print model_dict, model_dict['features.0.weight'].data
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
@@ -311,8 +312,8 @@ def main():
     # scheduler = LambdaLR(optimizer, lr_lambda=[lambda1, lambda2])
 
     for step in range(max_step):
-        print 'parameters: '
-        print model_dict['classifiers1.weight'].data, model_dict['classifiers1.bias'].data
+        #print 'parameters: '
+        #print model_dict['classifiers1.weight'].data, model_dict['classifiers1.bias'].data
         # adjust_learning_rate(optimizer, decay_rate=0.9, step=step)
         images, ground_truths = reader.next()
 
