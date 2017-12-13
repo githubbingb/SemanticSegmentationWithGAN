@@ -273,7 +273,7 @@ def main():
                 '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=batsize)
 
     model = Deeplab(n_classes=2)
-    model.apply(weights_init)
+    
     model_dict = model.state_dict()
     keys = model_dict.keys()
     print model, keys
@@ -290,6 +290,7 @@ def main():
 
     model.load_state_dict(torch.load('/media/Disk/wangfuyu/init.pth'))
     # print model_dict, model_dict['features.0.weight'].data
+    model.apply(weights_init)
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
