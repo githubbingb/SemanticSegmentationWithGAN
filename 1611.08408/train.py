@@ -111,7 +111,7 @@ def onehot_encoder(ground_truth):
 
         outputs[i, :, :, :] = onehot
 
-    return outputs.astype(float)
+    return outputs
 
 
 def _fast_hist(label_pred, label_true, num_classes):
@@ -192,7 +192,7 @@ def main():
         DLoss_fake.backward()
 
         #x_real = product(Interp(inputv), one_hot(ground_truthv))
-        x_real = Variable(torch.from_numpy(onehot_encoder(ground_truths)).long().cuda())
+        x_real = Variable(torch.from_numpy(onehot_encoder(ground_truths)).float().cuda())
         y_real = D(x_real)
         DLoss_real = mceLoss(y_real, real_label)
         DLoss_real.backward()
