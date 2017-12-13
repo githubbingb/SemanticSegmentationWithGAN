@@ -1,19 +1,19 @@
-# # import numpy as np
-# # import os
-# # import argparse
-# # import random
-# # import torch
-# # import torch.nn as nn
-# # import torch.backends.cudnn as cudnn
-# # import torch.optim as optim
-# # from torch.autograd import Variable
-# # import torch.nn.functional as f
-# # import torchvision.transforms as transforms
-# # from torch.utils.data import DataLoader
-# # import torchvision.models as models
-# # import torch.nn.functional as f
-# # from collections import OrderedDict
-#
+# import numpy as np
+# import os
+# import argparse
+# import random
+# import torch
+# import torch.nn as nn
+# import torch.backends.cudnn as cudnn
+# import torch.optim as optim
+# from torch.autograd import Variable
+# import torch.nn.functional as f
+# import torchvision.transforms as transforms
+# from torch.utils.data import DataLoader
+# import torchvision.models as models
+# import torch.nn.functional as f
+# from collections import OrderedDict
+
 # # lr = 1e-3
 #
 # # class Deeplab(nn.Module):
@@ -145,12 +145,13 @@
 # # for param_group in optimizer.param_groups:
 # #     print param_group.keys(), param_group['lr']
 #
-# from reader import Reader
-# import torch
-#
-# batsize = 1
-# reader = Reader('/media/Disk/work//801',
-#                 '/media/Disk/work/801/trainJM.txt', batchsize=batsize)
+from reader import Reader
+import torch
+import numpy as np
+
+batsize = 1
+reader = Reader('/media/Disk/work/801',
+                '/media/Disk/work/801/trainJM.txt', batchsize=batsize)
 #
 # for step in range(3000):
 #     # adjust_learning_rate(optimizer, decay_rate=0.9, step=step)
@@ -163,13 +164,28 @@
 #     # print temp1.sum()
 #
 #
+def onehot_encoder(ground_truth):
+    outputs = np.zeros((ground_truth.shape[0], 2, ground_truth.shape[1], ground_truth.shape[2]))
+    for i in xrange(ground_truth.shape[0]):
+        gt = ground_truth[i, :, :]
+        for index, c in enumerate(range(0, 2)):
+            mask = (gt == c)
+            mask = np.expand_dims(mask, 0)
+            print mask.shape
+            # mask.view(1, mask.shape[0], mask.shape[1])
+            if index == 0:
+                onehot = mask
+            else:
+                # print onehot.shape
+                onehot = np.concatenate((onehot, mask), axis=0)
 
-import torch
+        outputs[i, :, :, :] = onehot
 
-loss = torch.nn.CrossEntropyLoss()
-input = torch.autograd.Variable(torch.randn(3, 3, 5, 5), requires_grad=True)
-target = torch.autograd.Variable(torch.LongTensor(3, 5, 5).random_(3))
-output = loss(input, target)
-print output
-output.backward()
-print input.data.size(), target.data.size()
+    return outputs
+
+images, ground_truths = reader.next()
+
+on = onehot_encoder(ground_truths)
+
+
+print on.shape, on[0,0, 30:50, 30:50], on.shape, on[0,1,30:50, 30:50]
