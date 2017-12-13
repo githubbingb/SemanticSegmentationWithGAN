@@ -138,17 +138,17 @@ def main():
     reader = Reader('/media/Disk/wangfuyu/data/cxr/801/',
                 '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=batsize)
 
+    D = Discriminator(n_classes=2)
+    D.apply(weights_init)
+
     G = Generator(n_classes=2)
     G.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/init.pth'))
     # G.apply(weights_init)
 
-    mceLoss = nn.CrossEntropyLoss(ignore_index=255)
-
-    D = Discriminator(n_classes=2)
-    D.apply(weights_init)
+    print D, G
 
     bceLoss = nn.BCELoss()
-    mceLoss = nn.CrossEntropyLoss()
+    mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
     # input = torch.FloatTensor(opt.batchSize, 3, opt.imageSize, opt.imageSize)
     # ground_truth = torch.FloatTensor(opt.batchSize, opt.imageSize, opt.imageSize)
