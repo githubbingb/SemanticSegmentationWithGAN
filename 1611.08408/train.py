@@ -206,7 +206,7 @@ def main():
         #x_fake = f.softmax(pred_map)
         y_fake = D(x_fake)
         GLoss = mceLoss(pred_map, gts) + mceLoss(y_fake, real_label)
-        GLoss.bachward()
+        GLoss.backward()
         optimizerG.step()
 
         if step % 10 == 0:
