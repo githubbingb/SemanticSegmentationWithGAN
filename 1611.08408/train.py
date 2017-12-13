@@ -179,8 +179,8 @@ def main():
 
         imgs = Variable(torch.from_numpy(images).float().cuda())
         gts = Variable(torch.from_numpy(ground_truths).float().cuda())
-        real_label = Variable(torch.ones(1).cuda())
-        fake_label = Variable(torch.zeros(1).cuda())
+        real_label = Variable(torch.ones(1).long().cuda())
+        fake_label = Variable(torch.zeros(1).long().cuda())
 
         # train Discriminator
         D.zero_grad()
