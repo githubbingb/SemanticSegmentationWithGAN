@@ -177,10 +177,10 @@ def main():
         images, ground_truths = reader.next()
         # label_onehot = torch.FloatTensor([onehot_encoder(label1.numpy()) for label1 in label])
 
-        imgs = Variable(torch.from_numpy(images).float().cuda())
-        gts = Variable(torch.from_numpy(ground_truths).long().cuda())
-        real_label = Variable(torch.ones(1).long().cuda())
-        fake_label = Variable(torch.zeros(1).long().cuda())
+        imgs = Variable(torch.from_numpy(images).float()).cuda()
+        gts = Variable(torch.from_numpy(ground_truths).long()).cuda()
+        real_label = Variable(torch.ones(1).long()).cuda()
+        fake_label = Variable(torch.zeros(1).long()).cuda()
 
         # train Discriminator
         D.zero_grad()
@@ -192,7 +192,7 @@ def main():
         DLoss_fake.backward()
 
         #x_real = product(Interp(inputv), one_hot(ground_truthv))
-        x_real = Variable(torch.from_numpy(onehot_encoder(ground_truths)).float().cuda())
+        x_real = Variable(torch.from_numpy(onehot_encoder(ground_truths)).float()).cuda()
         y_real = D(x_real)
         DLoss_real = mceLoss(y_real, real_label)
         DLoss_real.backward()
