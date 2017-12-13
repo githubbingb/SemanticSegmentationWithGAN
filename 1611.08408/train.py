@@ -188,7 +188,7 @@ def main():
         # x_fake = product(Interp(inputv), f.softmax(pred_map))
         x_fake = f.softmax(pred_map)
         y_fake = D(x_fake.detach())
-        DLoss_fake = y_real(y_fake, fake_label)
+        DLoss_fake = mceLoss(y_fake, fake_label)
         DLoss_fake.backward()
 
         #x_real = product(Interp(inputv), one_hot(ground_truthv))
