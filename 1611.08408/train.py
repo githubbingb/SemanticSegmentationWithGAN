@@ -224,4 +224,6 @@ def main():
             torch.save(G.state_dict(), 'G_step_%d.pth' % step)
 
 
+if __name__ == '__main__':
+    main()
 
