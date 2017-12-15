@@ -9,11 +9,11 @@ def interp(src, zoom=None, shrink=None, mask=True):
     dst_np = np.zeros(shape=shape)
 
     if zoom is not None:
-        height_out = (shape[0] - 1) * zoom + 1
-        width_out = (shape[1] - 1) * zoom + 1
+        height_out = (shape[1] - 1) * zoom + 1
+        width_out = (shape[2] - 1) * zoom + 1
     if shrink is not None:
-        height_out = (shape[0] - 1) / shrink + 1
-        width_out = (shape[1] - 1) / shrink + 1
+        height_out = (shape[1] - 1) / shrink + 1
+        width_out = (shape[2] - 1) / shrink + 1
 
     for index in xrange(shape[0]):
         if mask:
