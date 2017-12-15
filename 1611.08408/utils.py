@@ -9,7 +9,7 @@ class MaskToTensor(object):
 
 
 def interp(src, zoom=None, shrink=None):
-    shape = src.size()
+    shape = src.shape
 
     if zoom is not None:
         height_out = (shape[1] - 1) * zoom + 1
