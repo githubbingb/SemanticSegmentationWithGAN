@@ -3,9 +3,8 @@ import torch
 import cv2
 
 
-def interp(src, zoom=None, shrink=None):
+def interp(src, zoom=None, shrink=None, mask=True):
     shape = src.size()
-    print shape
     src_np = src.numpy()
     dst_np = np.zeros(shape=shape)
 
@@ -17,8 +16,12 @@ def interp(src, zoom=None, shrink=None):
         width_out = (shape[1] - 1) / shrink + 1
 
     for index in xrange(shape[0]):
-        single = src_np[index, :, :, :].astype(np.uint8)
-        dst_np[index, :, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
+        if mask:
+            single = src_np[index, :, :].astype(np.uint8)
+            dst_np[index, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
+        else:
+            single = src_np[index, :, :, :].astype(np.uint8)
+            dst_np[index, :, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
     return torch.from_numpy(dst_np)
 
 def product(input, label_map):
