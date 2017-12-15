@@ -30,7 +30,7 @@ dataFolder = MyDataFolder(data_root='/media/Disk/wangfuyu/data/cxr/801/',
                           input_transform=transforms.Compose([
                              transforms.ToTensor(),
                              transforms.Normalize(*mean_std),]),
-                          target_transform=transforms.ToTensor()
+                          target_transform=MaskToTensor()
                           )
 
 dataloader = DataLoader(dataset=dataFolder, batch_size=opt.batchsize, shuffle=True, num_workers=2)
@@ -231,8 +231,8 @@ def main():
         adjust_learning_rate(optimizer, power=0.9, epoch=epoch)
         for index, data in enumerate(dataloader, 0):
             images, ground_truths = data
-            ground_truths.squeeze_(1)  # batchsize*1*h*w to batchsize*h*w
             ground_truths = interp(ground_truths, shrink=8)
+            print ground_truths.size()
 
             imgs = Variable(images.float()).cuda()
             gts = Variable(ground_truths.long()).cuda()

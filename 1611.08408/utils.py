@@ -3,6 +3,11 @@ import torch
 import cv2
 
 
+
+class MaskToTensor(object):
+    def __call__(self, tensor):
+        return tensor.squeeze_(1)
+
 def interp(src, zoom=None, shrink=None, mask=True):
     shape = src.size()
     src_np = src.numpy()
@@ -16,12 +21,9 @@ def interp(src, zoom=None, shrink=None, mask=True):
         width_out = (shape[2] - 1) / shrink + 1
 
     for index in xrange(shape[0]):
-        if mask:
-            single = src_np[index, :, :].astype(np.uint8)
-            dst_np[index, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
-        else:
-            single = src_np[index, :, :, :].astype(np.uint8)
-            dst_np[index, :, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
+        single = src_np[index, :, :].astype(np.uint8)
+        dst_np[index, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
+
     return torch.from_numpy(dst_np)
 
 def product(input, label_map):
