@@ -243,8 +243,8 @@ def main():
             loss.backward()
             optimizer.step()
 
-            preds = pred_map.data.max(1)[1].squeeze_(1).cpu().numpy()
-            acc, acc_class, _, _ = evaluate(preds.squeeze_(0), ground_truths.squeeze_(0).numpy(), 2)
+            preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
+            acc, acc_class, _, _ = evaluate(preds, ground_truths.squeeze_(0).numpy(), 2)
             print  acc, acc_class
 
 
