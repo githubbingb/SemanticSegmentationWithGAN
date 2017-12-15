@@ -153,7 +153,7 @@ def weights_init(m):
 def main():
     model = Deeplab(n_classes=2)
     model.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/init.pth'))
-    model.apply(weights_init)
+    # model.apply(weights_init)
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
@@ -229,30 +229,26 @@ def main():
         adjust_learning_rate(optimizer, power=0.9, epoch=epoch)
         for index, data in enumerate(dataloader, 0):
             images, ground_truths = data
-            ground_truths.squeeze_(1)     #batchsize*1*h*w to batchsize*h*w
+            ground_truths = interp(ground_truths, shrink=8)
+
+            ground_truths.squeeze_(1)  # batchsize*1*h*w to batchsize*h*w
 
             imgs = Variable(images.float()).cuda()
             gts = Variable(ground_truths.long()).cuda()
 
-        model.zero_grad()
-        pred_map = model(imgs)
-        loss = mceLoss(pred_map, gts)
-        loss.backward()
-        optimizer.step()
+            model.zero_grad()
+            pred_map = model(imgs)
+            loss = mceLoss(pred_map, gts)
+            loss.backward()
+            optimizer.step()
 
-        if step % 10 == 0:
-            print 'loss: ', loss, 'acc: '
-
-            preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
-            masks = gts.data.squeeze_(0).cpu().numpy()
-            acc, acc_class = evaluate(preds, masks, 2)
+            preds = pred_map.data.max(1)[1].squeeze_(1).cpu().numpy()
+            acc, acc_class, _, _ = evaluate(preds, ground_truths, 2)
             print  acc, acc_class
 
-        if step % 1000 == 0:
-            torch.save(model.state_dict(), 'step_%d.pth' % step)
 
+            torch.save(model.state_dict(), 'deeplab_epoch_%d.pth' % epoch)
 
-        # adjust_learning_rate(optimizer, step=step)
 
 if __name__ == '__main__':
     main()

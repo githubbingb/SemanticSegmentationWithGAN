@@ -1,19 +1,24 @@
 import numpy as np
+import torch
 import cv2
 
 
 def interp(src, zoom=None, shrink=None):
-    shape = src.shape
+    shape = src.size()
+    src_np = src.numpy().astype(np.uint8)
+    dst_np = np.zeros(shape=shape)
+
     if zoom is not None:
         height_out = (shape[0] - 1) * zoom + 1
         width_out = (shape[1] - 1) * zoom + 1
-
     if shrink is not None:
         height_out = (shape[0] - 1) / shrink + 1
         width_out = (shape[1] - 1) / shrink + 1
 
-    dst = cv2.resize(src, (height_out, width_out), cv2.INTER_LINEAR)
-    return dst
+    for index in xrange(shape[0]):
+        single = src_np[index, :, :, :]
+        dst_np[index, :, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
+    return torch.from_numpy(dst_np)
 
 def product(input, label_map):
     b = input[:, 0, :, :].repeat(1, label_map.size()[1], 1, 1)
