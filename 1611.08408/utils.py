@@ -59,7 +59,7 @@ def evaluate(predictions, gts, num_classes):
     freq = hist.sum(axis=1) / hist.sum()
     fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
 
-    return acc, acc_cls
+    return acc, acc_cls, mean_iu, fwavacc
 
 def onehot_encoder(ground_truth, n_classes):
     outputs = np.zeros((ground_truth.shape[0], n_classes, ground_truth.shape[1], ground_truth.shape[2]))
