@@ -5,6 +5,7 @@ import cv2
 
 def interp(src, zoom=None, shrink=None):
     shape = src.size()
+    print shape
     src_np = src.numpy()
     dst_np = np.zeros(shape=shape)
 

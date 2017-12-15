@@ -32,7 +32,7 @@ class MyDataFolder(data.Dataset):
     def __getitem__(self, index):
         img = self.loader(self.img_list[index])
         label = self.loader(self.label_list[index], gray=True)
-        
+
         if self.input_transform is not None:
             img = self.input_transform(img)
         if self.target_transform is not None:
