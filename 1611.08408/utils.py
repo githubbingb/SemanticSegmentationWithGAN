@@ -11,7 +11,6 @@ class MaskToTensor(object):
 def interp(src, zoom=None, shrink=None, mask=True):
     shape = src.size()
     src_np = src.numpy()
-    dst_np = np.zeros(shape=shape)
 
     if zoom is not None:
         height_out = (shape[1] - 1) * zoom + 1
@@ -19,6 +18,8 @@ def interp(src, zoom=None, shrink=None, mask=True):
     if shrink is not None:
         height_out = (shape[1] - 1) / shrink + 1
         width_out = (shape[2] - 1) / shrink + 1
+
+    dst_np = np.zeros(shape=(shape[0], height_out, width_out))
 
     for index in xrange(shape[0]):
         single = src_np[index, :, :].astype(np.uint8)
