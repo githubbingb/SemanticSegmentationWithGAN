@@ -241,7 +241,7 @@ def main():
         adjust_learning_rate(optimizer, power=0.9, epoch=epoch)
         for index, data in enumerate(dataloader, 0):
             images, ground_truths = data
-            ground_truths = interp(ground_truths, shrink=8)
+            ground_truths = interp(ground_truths.numpy(), shrink=8)
 
             imgs = Variable(images.float()).cuda()
             gts = Variable(ground_truths.long()).cuda()

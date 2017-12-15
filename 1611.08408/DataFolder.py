@@ -32,17 +32,14 @@ class MyDataFolder(data.Dataset):
     def __getitem__(self, index):
         img = self.loader(self.img_list[index])
         # print img.size[1]
-        img_down = img.resize(((img.size[0] - 1) / 8 + 1, (img.size[1] - 1) / 8 + 1))
         label = self.loader(self.label_list[index], gray=True)
-        label_down = img.resize(((label.size[0] - 1) / 8 + 1, (label.size[1] - 1) / 8 + 1))
 
         if self.input_transform is not None:
             img = self.input_transform(img)
-            img = self.input_transform(img_down)
         if self.target_transform is not None:
             label = self.target_transform(label)
 
-        return img, img_down, label, label_down
+        return img, label
 
     def __len__(self):
         return len(self.img_list)

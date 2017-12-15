@@ -23,7 +23,7 @@ def interp(src, zoom=None, shrink=None):
     for index in xrange(shape[0]):
         single = src[index, :, :].astype(np.uint8)
         dst[index, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
-    return dst
+    return torch.from_numpy(dst).float()
 
 
 def product(input, label_map):
