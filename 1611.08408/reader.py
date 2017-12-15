@@ -57,4 +57,4 @@ class DataReader():
         ground_truths_interp = ground_truths_interp.transpose((2, 0, 1))
         ground_truths = ground_truths.transpose((2, 0, 1))
 
-        return images, images_interp, ground_truths, ground_truths
+        return images, images_interp, ground_truths, ground_truths_interp

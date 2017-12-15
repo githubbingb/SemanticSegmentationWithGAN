@@ -42,7 +42,7 @@ def main():
     dataReader = DataReader(data_root='/media/Disk/wangfuyu/data/cxr/801/',
                     txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt')
 
-    D = Discriminator(n_classes=opt.nclasses)
+    D = Discriminator(n_classes=opt.nclasses, product=True)
     D.apply(weights_init)
 
     G = Generator(n_classes=opt.nclasses)
@@ -136,12 +136,12 @@ def main():
         # train Discriminator
         D.zero_grad()
         pred_map = G(imgs)
-        x_fake = Variable(product(images_down, f.softmax(pred_map).cpu().data))
+        x_fake = Variable(product(torch.from_numpy(images_down).float(), f.softmax(pred_map).cpu().data)).cuda()
         y_fake = D(x_fake.detach())
         DLoss_fake = mceLoss(y_fake, fake_label)
         DLoss_fake.backward()
 
-        x_real = Variable(product(images_down, onehot_encoder(ground_truths_down, n_classes=opt.nclasses))).cuda()
+        x_real = Variable(product(torch.from_numpy(images_down).float(), onehot_encoder(ground_truths_down, n_classes=opt.nclasses))).cuda()
         y_real = D(x_real)
         DLoss_real = mceLoss(y_real, real_label)
         DLoss_real.backward()
