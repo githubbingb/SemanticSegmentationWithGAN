@@ -16,6 +16,7 @@ cudnn.benchmark = True
 
 parser = argparse.ArgumentParser()
 
+parser.add_argument('--batchsize', type=int, default=1, help='input batch size')
 parser.add_argument('--lr', type=float, default=1e-3, help='learning rate, default=0.0002')
 parser.add_argument('--niter', type=int, default=2000, help='number of epochs to train for')
 
