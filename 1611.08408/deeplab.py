@@ -243,7 +243,6 @@ def main():
         for index, data in enumerate(dataloader, 0):
             images, ground_truths = data
             ground_truths = interp(ground_truths, shrink=8)
-            print ground_truths.size()
 
             imgs = Variable(images.float()).cuda()
             gts = Variable(ground_truths.long()).cuda()
@@ -256,10 +255,11 @@ def main():
 
             preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
             acc, acc_class, miou, _ = evaluate(preds, ground_truths.squeeze_(0).numpy(), 2)
-            print  acc, acc_class, miou
 
+        print 'loss: ', loss
+        print acc, acc_class, miou
 
-            torch.save(model.state_dict(), 'deeplab_epoch_%d.pth' % epoch)
+        torch.save(model.state_dict(), 'deeplab_epoch_%d.pth' % epoch)
 
 
 if __name__ == '__main__':
