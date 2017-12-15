@@ -160,7 +160,6 @@ def main():
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
-
     model.cuda()
     mceLoss.cuda()
 
