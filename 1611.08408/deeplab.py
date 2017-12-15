@@ -28,8 +28,9 @@ mean_std = ([103.939, 116.779, 123.68], [1.0, 1.0, 1.0])
 dataFolder = MyDataFolder(data_root='/media/Disk/wangfuyu/data/cxr/801/',
                           txt='/media/Disk/wangfuyu/data/cxr/801/trainJM.txt',
                           input_transform=transforms.Compose([
-                             transforms.ToTensor(),
-                             transforms.Normalize(*mean_std),]),
+                              transforms.ToTensor(),
+                              transforms.Lambda(lambda x: x.mul_(255)),
+                              transforms.Normalize(*mean_std), ]),
                           target_transform=MaskToTensor()
                           )
 
