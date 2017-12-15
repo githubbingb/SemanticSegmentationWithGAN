@@ -46,4 +46,5 @@ class Reader():
         ground_truths_interp = ground_truths_interp.transpose((2,0,1))
         # print self.index
 
+
         return images, ground_truths_interp
