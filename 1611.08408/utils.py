@@ -27,19 +27,15 @@ def interp(src, zoom=None, shrink=None):
 
 
 def product(input, label_map):
-    n_class = label_map.size()[1]
-    b = np.tile(np.reshape(input[:, 0, :, :], newshape=(-1, 1, label_map.size()[2], label_map.size()[3])),
-                (1, n_class, 1, 1))
-    g = np.tile(np.reshape(input[:, 1, :, :], newshape=(-1, 1, label_map.size()[2], label_map.size()[3])),
-                (1, n_class, 1, 1))
-    r = np.tile(np.reshape(input[:, 2, :, :], newshape=(-1, 1, label_map.size()[2], label_map.size()[3])),
-                (1, n_class, 1, 1))
+    b = input[:, 0, :, :].unsqueeze(1).repeat(1, label_map.size()[1], 1, 1)
+    g = input[:, 1, :, :].unsqueeze(1).repeat(1, label_map.size()[1], 1, 1)
+    r = input[:, 2, :, :].unsqueeze(1).repeat(1, label_map.size()[1], 1, 1)
 
     product_b = label_map * b
     product_g = label_map * g
     product_r = label_map * r
 
-    return np.concatenate((product_b, product_g, product_r), axis=1)
+    return torch.cat((product_b, product_g, product_r), dim=1).float()
 
 
 def _fast_hist(label_pred, label_true, num_classes):
@@ -78,4 +74,5 @@ def onehot_encoder(ground_truth, n_classes):
             else:
                 onehot = np.concatenate((onehot, mask), axis=0)
         outputs[i, :, :, :] = onehot
-    return outputs
+
+    return torch.from_numpy(outputs).float()

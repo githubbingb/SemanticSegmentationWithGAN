@@ -128,7 +128,6 @@ def main():
         images, images_down, _, ground_truths_down = dataReader.next()
 
         imgs = Variable(torch.from_numpy(images).float()).cuda()
-        imgs_down = Variable(torch.from_numpy(images_down).float()).cuda()
         gts_down = Variable(torch.from_numpy(ground_truths_down).long()).cuda()
 
         real_label = Variable(torch.ones(1).long()).cuda()
@@ -137,7 +136,7 @@ def main():
         # train Discriminator
         D.zero_grad()
         pred_map = G(imgs)
-        x_fake = Variable(product(imgs_down, f.softmax(pred_map).data.numpy()))
+        x_fake = Variable(product(images_down, f.softmax(pred_map).cpu().data))
         y_fake = D(x_fake.detach())
         DLoss_fake = mceLoss(y_fake, fake_label)
         DLoss_fake.backward()
