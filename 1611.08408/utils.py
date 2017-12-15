@@ -27,7 +27,6 @@ def interp(src, zoom=None, shrink=None):
 
 
 def product(input, label_map):
-    print input.size(), label_map.size()
     b = input[:, 0, :, :].unsqueeze(1).repeat(1, label_map.size()[1], 1, 1)
     g = input[:, 1, :, :].unsqueeze(1).repeat(1, label_map.size()[1], 1, 1)
     r = input[:, 2, :, :].unsqueeze(1).repeat(1, label_map.size()[1], 1, 1)

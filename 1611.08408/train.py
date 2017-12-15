@@ -155,15 +155,17 @@ def main():
         GLoss.backward()
         optimizerG.step()
 
-        print 'DLoss_fake: ', DLoss_fake, 'DLoss_real: ', DLoss_real, 'GLoss: ', GLoss
+        if step % 20 == 0:
+            print 'DLoss_fake: ', DLoss_fake, 'DLoss_real: ', DLoss_real, 'GLoss: ', GLoss
 
-        preds = pred_map.data.max(1)[1].squeeze_(1).cpu().numpy()
-        masks = gts_down.data.cpu().numpy()
-        acc, acc_class, miou, _ = evaluate(preds, masks, 2)
-        print acc, acc_class, miou
+            preds = pred_map.data.max(1)[1].squeeze_(1).cpu().numpy()
+            masks = gts_down.data.cpu().numpy()
+            acc, acc_class, miou, _ = evaluate(preds, masks, 2)
+            print acc, acc_class, miou
 
-        torch.save(D.state_dict(), 'D_step_%d.pth' % step)
-        torch.save(G.state_dict(), 'G_step_%d.pth' % step)
+        if step % 1000 == 0:
+            torch.save(D.state_dict(), 'D_step_%d.pth' % step)
+            torch.save(G.state_dict(), 'G_step_%d.pth' % step)
 
 
 if __name__ == '__main__':
