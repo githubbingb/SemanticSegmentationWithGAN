@@ -28,9 +28,12 @@ def interp(src, zoom=None, shrink=None):
 
 def product(input, label_map):
     n_class = label_map.size()[1]
-    b = np.tile(np.expand_dims(input[:, 0, :, :], axis=1), (1, n_class, 1, 1))
-    g = np.tile(np.expand_dims(input[:, 1, :, :], axis=1), (1, n_class, 1, 1))
-    r = np.tile(np.expand_dims(input[:, 2, :, :], axis=1), (1, n_class, 1, 1))
+    b = np.tile(np.reshape(input[:, 0, :, :], newshape=(-1, 1, label_map.size()[2], label_map.size()[3])),
+                (1, n_class, 1, 1))
+    g = np.tile(np.reshape(input[:, 1, :, :], newshape=(-1, 1, label_map.size()[2], label_map.size()[3])),
+                (1, n_class, 1, 1))
+    r = np.tile(np.reshape(input[:, 2, :, :], newshape=(-1, 1, label_map.size()[2], label_map.size()[3])),
+                (1, n_class, 1, 1))
 
     product_b = label_map * b
     product_g = label_map * g
