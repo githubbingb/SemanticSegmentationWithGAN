@@ -137,7 +137,7 @@ def main():
         # train Discriminator
         D.zero_grad()
         pred_map = G(imgs)
-        x_fake = product(imgs_down, f.softmax(pred_map))
+        x_fake = Variable(product(imgs_down, f.softmax(pred_map).data.numpy()))
         y_fake = D(x_fake.detach())
         DLoss_fake = mceLoss(y_fake, fake_label)
         DLoss_fake.backward()
