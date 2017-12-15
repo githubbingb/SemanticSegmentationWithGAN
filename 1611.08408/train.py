@@ -127,9 +127,9 @@ def main():
         adjust_learning_rate(optimizerD)
         images, images_down, _, ground_truths_down = dataReader.next()
 
-        imgs = Variable(images.float()).cuda()
-        imgs_down = Variable(images_down.float()).cuda()
-        gts_down = Variable(ground_truths_down.long()).cuda()
+        imgs = Variable(torch.from_numpy(images).float()).cuda()
+        imgs_down = Variable(torch.from_numpy(images_down).float()).cuda()
+        gts_down = Variable(torch.from_numpy(ground_truths_down).long()).cuda()
 
         real_label = Variable(torch.ones(1).long()).cuda()
         fake_label = Variable(torch.zeros(1).long()).cuda()
