@@ -56,66 +56,66 @@ def main():
     D.cuda()
     mceLoss.cuda()
 
-    optimizerG = optim.SGD([{'params': [param for name, param in model.features.named_parameters() if
+    optimizerG = optim.SGD([{'params': [param for name, param in G.features.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': opt.lr},
-                           {'params': [param for name, param in model.features.named_parameters() if
+                           {'params': [param for name, param in G.features.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 2 * opt.lr},
 
-                           {'params': [param for name, param in model.fc1.named_parameters() if
+                           {'params': [param for name, param in G.fc1.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': opt.lr},
-                           {'params': [param for name, param in model.fc1.named_parameters() if
+                           {'params': [param for name, param in G.fc1.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 2 * opt.lr},
 
-                           {'params': [param for name, param in model.fc2.named_parameters() if
+                           {'params': [param for name, param in G.fc2.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': opt.lr},
-                           {'params': [param for name, param in model.fc2.named_parameters() if
+                           {'params': [param for name, param in G.fc2.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 2 * opt.lr},
 
-                           {'params': [param for name, param in model.fc3.named_parameters() if
+                           {'params': [param for name, param in G.fc3.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': opt.lr},
-                           {'params': [param for name, param in model.fc3.named_parameters() if
+                           {'params': [param for name, param in G.fc3.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 2 * opt.lr},
 
-                           {'params': [param for name, param in model.fc4.named_parameters() if
+                           {'params': [param for name, param in G.fc4.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': opt.lr},
-                           {'params': [param for name, param in model.fc4.named_parameters() if
+                           {'params': [param for name, param in G.fc4.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 2 * opt.lr},
 
-                           {'params': [param for name, param in model.classifiers1.named_parameters() if
+                           {'params': [param for name, param in G.classifiers1.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': 10 * opt.lr},
-                           {'params': [param for name, param in model.classifiers1.named_parameters() if
+                           {'params': [param for name, param in G.classifiers1.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 20 * opt.lr},
 
-                           {'params': [param for name, param in model.classifiers2.named_parameters() if
+                           {'params': [param for name, param in G.classifiers2.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': 10 * opt.lr},
-                           {'params': [param for name, param in model.classifiers2.named_parameters() if
+                           {'params': [param for name, param in G.classifiers2.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 20 * opt.lr},
 
-                           {'params': [param for name, param in model.classifiers3.named_parameters() if
+                           {'params': [param for name, param in G.classifiers3.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': 10 * opt.lr},
-                           {'params': [param for name, param in model.classifiers3.named_parameters() if
+                           {'params': [param for name, param in G.classifiers3.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 20 * opt.lr},
 
-                           {'params': [param for name, param in model.classifiers4.named_parameters() if
+                           {'params': [param for name, param in G.classifiers4.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': 10 * opt.lr},
-                           {'params': [param for name, param in model.classifiers4.named_parameters() if
+                           {'params': [param for name, param in G.classifiers4.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 20 * opt.lr},
                            ], momentum=0.9, weight_decay=5e-4)
