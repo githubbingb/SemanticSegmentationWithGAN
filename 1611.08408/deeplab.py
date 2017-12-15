@@ -10,7 +10,7 @@ from DataFolder import MyDataFolder
 from torch.utils.data import DataLoader
 from utils import *
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 
 cudnn.benchmark = True
 
