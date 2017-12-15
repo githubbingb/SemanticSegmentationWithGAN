@@ -8,9 +8,8 @@ class MaskToTensor(object):
         return torch.from_numpy(np.array(img, dtype=np.int32)).long().squeeze_(1)
 
 
-def interp(src, zoom=None, shrink=None, mask=True):
+def interp(src, zoom=None, shrink=None):
     shape = src.size()
-    src_np = src.numpy()
 
     if zoom is not None:
         height_out = (shape[1] - 1) * zoom + 1
@@ -19,23 +18,25 @@ def interp(src, zoom=None, shrink=None, mask=True):
         height_out = (shape[1] - 1) / shrink + 1
         width_out = (shape[2] - 1) / shrink + 1
 
-    dst_np = np.zeros(shape=(shape[0], height_out, width_out))
+    dst = np.zeros(shape=(shape[0], height_out, width_out))
 
     for index in xrange(shape[0]):
-        single = src_np[index, :, :].astype(np.uint8)
-        dst_np[index, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
-    return torch.from_numpy(dst_np)
+        single = src[index, :, :].astype(np.uint8)
+        dst[index, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
+    return dst
+
 
 def product(input, label_map):
-    b = input[:, 0, :, :].repeat(1, label_map.size()[1], 1, 1)
-    g = input[:, 1, :, :].repeat(1, label_map.size()[1], 1, 1)
-    r = input[:, 2, :, :].repeat(1, label_map.size()[1], 1, 1)
+    n_class = label_map.size()[1]
+    b = np.tile(np.expand_dims(input[:, 0, :, :], axis=1), (1, n_class, 1, 1))
+    g = np.tile(np.expand_dims(input[:, 1, :, :], axis=1), (1, n_class, 1, 1))
+    r = np.tile(np.expand_dims(input[:, 2, :, :], axis=1), (1, n_class, 1, 1))
 
     product_b = label_map * b
     product_g = label_map * g
     product_r = label_map * r
 
-    return torch.cat((product_b, product_g, product_r), dim=1)
+    return np.concatenate((product_b, product_g, product_r), axis=1)
 
 
 def _fast_hist(label_pred, label_true, num_classes):
@@ -60,6 +61,7 @@ def evaluate(predictions, gts, num_classes):
     fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
 
     return acc, acc_cls, mean_iu, fwavacc
+
 
 def onehot_encoder(ground_truth, n_classes):
     outputs = np.zeros((ground_truth.shape[0], n_classes, ground_truth.shape[1], ground_truth.shape[2]))

@@ -7,11 +7,7 @@ import torch.backends.cudnn as cudnn
 import torch.optim as optim
 from torch.autograd import Variable
 import torch.nn.functional as f
-import torchvision.transforms as transforms
-from DataFolder import MyDataFolder
-from torch.utils.data import DataLoader
-from reader import Reader
-import numpy as np
+from reader import *
 from models import Generator, Discriminator
 from utils import *
 
@@ -20,25 +16,13 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 parser = argparse.ArgumentParser()
 parser.add_argument('--batchsize', type=int, default=1, help='input batch size')
 parser.add_argument('--nclasses', type=int, default=2, help='number of classes')
-parser.add_argument('--niter', type=int, default=25, help='number of epochs to train for')
+parser.add_argument('--niter', type=int, default=20001, help='number of epochs to train for')
 parser.add_argument('--lr', type=float, default=1e-3, help='learning rate, default=0.0002')
 
 
 opt = parser.parse_args()
 
 cudnn.benchmark = True
-
-
-mean_std = ([103.939, 116.779, 123.68], [1.0, 1.0, 1.0])
-
-dataFolder = MyDataFolder(data_root='/media/Disk/work', txt='/media/Disk/work/train.txt',
-                         input_transform=transforms.Compose([
-                             transforms.ToTensor(),
-                              transforms.Normalize(*mean_std),
-                         ]))
-
-dataloader = DataLoader(dataset=dataFolder, batch_size=opt.batchsize, shuffle=True, num_workers=2)
-
 
 def weights_init(m):
     classname = m.__class__.__name__
@@ -55,8 +39,8 @@ def adjust_learning_rate(optimizer, power=0.9, step=0):
             param_group['lr'] = param_group['lr'] * ((1 - 1.0* step / opt.niter) ** (power))
 
 def main():
-    reader = Reader('/media/Disk/wangfuyu/data/cxr/801/',
-                '/media/Disk/wangfuyu/data/cxr/801/trainJM.txt', batchsize=opt.batchsize)
+    dataReader = DataReader(data_root='/media/Disk/wangfuyu/data/cxr/801/',
+                    txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt')
 
     D = Discriminator(n_classes=opt.nclasses)
     D.apply(weights_init)
@@ -64,11 +48,9 @@ def main():
     G = Generator(n_classes=opt.nclasses)
     G.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/init.pth'))
     # G.apply(weights_init)
-
     print D, G
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
-
 
     G.cuda()
     D.cuda()
@@ -138,34 +120,29 @@ def main():
                             'lr': 20 * opt.lr},
                            ], momentum=0.9, weight_decay=5e-4)
 
-    optimizerD = optim.Adam(D.parameters(), lr=1e-3)
+    optimizerD = optim.SGD(D.parameters(), lr=1e-3, momentum=0.9, weight_decay=5e-4)
 
-
-    for epoch in xrange(opt.niter):
-        for index, data in enumerate(dataloader, 0):
-
-
-    for step in range(20000):
+    for step in xrange(0, opt.niter):
         adjust_learning_rate(optimizerG)
-        images, ground_truths = reader.next()
-        # label_onehot = torch.FloatTensor([onehot_encoder(label1.numpy()) for label1 in label])
+        adjust_learning_rate(optimizerD)
+        images, images_down, _, ground_truths_down = dataReader.next()
 
-        imgs = Variable(torch.from_numpy(images).float()).cuda()
-        gts = Variable(torch.from_numpy(ground_truths).long()).cuda()
+        imgs = Variable(images.float()).cuda()
+        imgs_down = Variable(images_down.float()).cuda()
+        gts_down = Variable(ground_truths_down.long()).cuda()
+
         real_label = Variable(torch.ones(1).long()).cuda()
         fake_label = Variable(torch.zeros(1).long()).cuda()
 
         # train Discriminator
         D.zero_grad()
         pred_map = G(imgs)
-        # x_fake = product(Interp(inputv), f.softmax(pred_map))
-        x_fake = f.softmax(pred_map)
+        x_fake = product(imgs_down, f.softmax(pred_map))
         y_fake = D(x_fake.detach())
         DLoss_fake = mceLoss(y_fake, fake_label)
         DLoss_fake.backward()
 
-        #x_real = product(Interp(inputv), one_hot(ground_truthv))
-        x_real = Variable(torch.from_numpy(onehot_encoder(ground_truths)).float()).cuda()
+        x_real = Variable(product(images_down, onehot_encoder(ground_truths_down, n_classes=opt.nclasses))).cuda()
         y_real = D(x_real)
         DLoss_real = mceLoss(y_real, real_label)
         DLoss_real.backward()
@@ -174,25 +151,20 @@ def main():
 
         # train Generator
         G.zero_grad()
-        #pred_map = G(imgs)
-        #x_fake = product(inputv,  f.softmax(pred_map))
-        #x_fake = f.softmax(pred_map)
         y_fake = D(x_fake)
-        GLoss = mceLoss(pred_map, gts) + mceLoss(y_fake, real_label)
+        GLoss = mceLoss(pred_map, gts_down) + mceLoss(y_fake, real_label)
         GLoss.backward()
         optimizerG.step()
 
-        if step % 10 == 0:
-            print 'DLoss_fake: ', DLoss_fake, 'DLoss_real: ', DLoss_real, 'GLoss: ', GLoss
+        print 'DLoss_fake: ', DLoss_fake, 'DLoss_real: ', DLoss_real, 'GLoss: ', GLoss
 
-            preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
-            masks = gts.data.squeeze_(0).cpu().numpy()
-            acc, acc_class = evaluate(preds, masks, 2)
-            print acc, acc_class
+        preds = pred_map.data.max(1)[1].squeeze_(1).cpu().numpy()
+        masks = gts_down.data.cpu().numpy()
+        acc, acc_class, miou, _ = evaluate(preds, masks, 2)
+        print acc, acc_class, miou
 
-        if step % 1000 == 0:
-            torch.save(D.state_dict(), 'D_step_%d.pth' % step)
-            torch.save(G.state_dict(), 'G_step_%d.pth' % step)
+        torch.save(D.state_dict(), 'D_step_%d.pth' % step)
+        torch.save(G.state_dict(), 'G_step_%d.pth' % step)
 
 
 if __name__ == '__main__':
