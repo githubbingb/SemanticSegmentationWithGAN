@@ -50,7 +50,7 @@ def weights_init(m):
 
 
 def adjust_learning_rate(optimizer, power=0.9, step=0):
-    for index, param_group in optimizer.param_groups:
+    for index, param_group in optimizer.param_groups():
         if index %2 == 0:
             param_group['lr'] = param_group['lr'] * ((1 - 1.0* step / opt.niter) ** (power))
 

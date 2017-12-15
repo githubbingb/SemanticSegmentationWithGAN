@@ -17,6 +17,7 @@ cudnn.benchmark = True
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--batchsize', type=int, default=1, help='input batch size')
+parser.add_argument('--nclasses', type=int, default=2, help='number of classes')
 parser.add_argument('--lr', type=float, default=1e-3, help='learning rate, default=0.0002')
 parser.add_argument('--niter', type=int, default=2000, help='number of epochs to train for')
 
@@ -136,7 +137,7 @@ class Deeplab(nn.Module):
 
 
 def adjust_learning_rate(optimizer, power=0.9, epoch=0):
-    for index, param_group in optimizer.param_groups:
+    for index, param_group in optimizer.param_groups():
         if index %2 == 0:
             param_group['lr'] = param_group['lr'] * ((1 - 1.0* epoch / opt.niter) ** (power))
 
