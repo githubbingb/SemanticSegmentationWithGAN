@@ -137,7 +137,7 @@ class Deeplab(nn.Module):
 
 
 def adjust_learning_rate(optimizer, power=0.9, epoch=0):
-    for index, param_group in optimizer.param_groups():
+    for index, param_group in enumerate(optimizer.param_groups()):
         if index %2 == 0:
             param_group['lr'] = param_group['lr'] * ((1 - 1.0* epoch / opt.niter) ** (power))
 
