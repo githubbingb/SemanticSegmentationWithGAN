@@ -164,82 +164,82 @@ def main():
     model.cuda()
     mceLoss.cuda()
 
-    # optimizer = optim.SGD([{'params': [param for name, param in model.features.named_parameters() if
-    #                                    name[-4] != 'bias'],
-    #                         'lr': opt.lr},
-    #                        {'params': [param for name, param in model.features.named_parameters() if
-    #                                    name[-4] == 'bias'],
-    #                         'lr': 2 * opt.lr},
-    #
-    #                        {'params': [param for name, param in model.fc1.named_parameters() if
-    #                                    name[-4] != 'bias'],
-    #                         'lr': opt.lr},
-    #                        {'params': [param for name, param in model.fc1.named_parameters() if
-    #                                    name[-4] == 'bias'],
-    #                         'lr': 2 * opt.lr},
-    #
-    #                        {'params': [param for name, param in model.fc2.named_parameters() if
-    #                                    name[-4] != 'bias'],
-    #                         'lr': opt.lr},
-    #                        {'params': [param for name, param in model.fc2.named_parameters() if
-    #                                    name[-4] == 'bias'],
-    #                         'lr': 2 * opt.lr},
-    #
-    #                        {'params': [param for name, param in model.fc3.named_parameters() if
-    #                                    name[-4] != 'bias'],
-    #                         'lr': opt.lr},
-    #                        {'params': [param for name, param in model.fc3.named_parameters() if
-    #                                    name[-4] == 'bias'],
-    #                         'lr': 2 * opt.lr},
-    #
-    #                        {'params': [param for name, param in model.fc4.named_parameters() if
-    #                                    name[-4] != 'bias'],
-    #                         'lr': opt.lr},
-    #                        {'params': [param for name, param in model.fc4.named_parameters() if
-    #                                    name[-4] == 'bias'],
-    #                         'lr': 2 * opt.lr},
-    #
-    #                        {'params': [param for name, param in model.classifiers1.named_parameters() if
-    #                                    name[-4] != 'bias'],
-    #                         'lr': 10 * opt.lr},
-    #                        {'params': [param for name, param in model.classifiers1.named_parameters() if
-    #                                    name[-4] == 'bias'],
-    #                         'lr': 20 * opt.lr},
-    #
-    #                        {'params': [param for name, param in model.classifiers2.named_parameters() if
-    #                                    name[-4] != 'bias'],
-    #                         'lr': 10 * opt.lr},
-    #                        {'params': [param for name, param in model.classifiers2.named_parameters() if
-    #                                    name[-4] == 'bias'],
-    #                         'lr': 20 * opt.lr},
-    #
-    #                        {'params': [param for name, param in model.classifiers3.named_parameters() if
-    #                                    name[-4] != 'bias'],
-    #                         'lr': 10 * opt.lr},
-    #                        {'params': [param for name, param in model.classifiers3.named_parameters() if
-    #                                    name[-4] == 'bias'],
-    #                         'lr': 20 * opt.lr},
-    #
-    #                        {'params': [param for name, param in model.classifiers4.named_parameters() if
-    #                                    name[-4] != 'bias'],
-    #                         'lr': 10 * opt.lr},
-    #                        {'params': [param for name, param in model.classifiers4.named_parameters() if
-    #                                    name[-4] == 'bias'],
-    #                         'lr': 20 * opt.lr},
-    #                        ], momentum=0.9, weight_decay=5e-4)
-    optimizer = optim.SGD([{'params': model.features.parameters()},
-                           {'params': model.fc1.parameters()},
-                           {'params': model.fc2.parameters()},
-                           {'params': model.fc3.parameters()},
-                           {'params': model.fc4.parameters()},
-                           {'params': model.classifiers1.parameters(), 'lr': 1e-2},
-                           {'params': model.classifiers2.parameters(), 'lr': 1e-2},
-                           {'params': model.classifiers3.parameters(), 'lr': 1e-2},
-                           {'params': model.classifiers4.parameters(), 'lr': 1e-2},
-                           ], lr=1e-3, momentum=0.9, weight_decay=5e-4)
+    optimizer = optim.SGD([{'params': [param for name, param in model.features.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': opt.lr},
+                           {'params': [param for name, param in model.features.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 2 * opt.lr},
+
+                           {'params': [param for name, param in model.fc1.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': opt.lr},
+                           {'params': [param for name, param in model.fc1.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 2 * opt.lr},
+
+                           {'params': [param for name, param in model.fc2.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': opt.lr},
+                           {'params': [param for name, param in model.fc2.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 2 * opt.lr},
+
+                           {'params': [param for name, param in model.fc3.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': opt.lr},
+                           {'params': [param for name, param in model.fc3.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 2 * opt.lr},
+
+                           {'params': [param for name, param in model.fc4.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': opt.lr},
+                           {'params': [param for name, param in model.fc4.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 2 * opt.lr},
+
+                           {'params': [param for name, param in model.classifiers1.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': 10 * opt.lr},
+                           {'params': [param for name, param in model.classifiers1.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 20 * opt.lr},
+
+                           {'params': [param for name, param in model.classifiers2.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': 10 * opt.lr},
+                           {'params': [param for name, param in model.classifiers2.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 20 * opt.lr},
+
+                           {'params': [param for name, param in model.classifiers3.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': 10 * opt.lr},
+                           {'params': [param for name, param in model.classifiers3.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 20 * opt.lr},
+
+                           {'params': [param for name, param in model.classifiers4.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': 10 * opt.lr},
+                           {'params': [param for name, param in model.classifiers4.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 20 * opt.lr},
+                           ], momentum=0.9, weight_decay=5e-4)
+    # optimizer = optim.SGD([{'params': model.features.parameters()},
+    #                        {'params': model.fc1.parameters()},
+    #                        {'params': model.fc2.parameters()},
+    #                        {'params': model.fc3.parameters()},
+    #                        {'params': model.fc4.parameters()},
+    #                        {'params': model.classifiers1.parameters(), 'lr': 1e-2},
+    #                        {'params': model.classifiers2.parameters(), 'lr': 1e-2},
+    #                        {'params': model.classifiers3.parameters(), 'lr': 1e-2},
+    #                        {'params': model.classifiers4.parameters(), 'lr': 1e-2},
+    #                        ], lr=1e-3, momentum=0.9, weight_decay=5e-4)
 
     for epoch in range(opt.niter):
-        #adjust_learning_rate(optimizer, power=0.9, epoch=epoch)
+        adjust_learning_rate(optimizer, power=0.9, epoch=epoch)
         for index, data in enumerate(dataloader, 0):
             images, ground_truths = data
             ground_truths = interp(ground_truths, shrink=8)
@@ -255,8 +255,8 @@ def main():
             optimizer.step()
 
             preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
-            acc, acc_class, _, _ = evaluate(preds, ground_truths.squeeze_(0).numpy(), 2)
-            print  acc, acc_class
+            acc, acc_class, miou, _ = evaluate(preds, ground_truths.squeeze_(0).numpy(), 2)
+            print  acc, acc_class, miou
 
 
             torch.save(model.state_dict(), 'deeplab_epoch_%d.pth' % epoch)
