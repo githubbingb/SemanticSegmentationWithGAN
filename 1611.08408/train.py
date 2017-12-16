@@ -41,7 +41,7 @@ def adjust_learning_rate(optimizer, power=0.9, step=0):
 
 def main():
     dataReader = DataReader(data_root='/media/Disk/wangfuyu/data/cxr/801/',
-                            txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt',
+                            txt='/media/Disk/wangfuyu/data/cxr/801/odd_id.txt',
                             batchsize=opt.batchsize)
 
     D = Discriminator(n_classes=opt.nclasses, product=True)

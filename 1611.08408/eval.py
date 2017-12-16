@@ -24,7 +24,7 @@ cudnn.benchmark = True
 
 def main():
     dataReader = DataReader(data_root='/media/Disk/wangfuyu/data/cxr/801/',
-                            txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt',
+                            txt='/media/Disk/wangfuyu/data/cxr/801/testJM_id.txt',
                             batchsize=opt.batchsize, is_train=False)
 
     G = Generator(n_classes=opt.nclasses)

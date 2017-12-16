@@ -25,8 +25,8 @@ opt = parser.parse_args()
 
 mean_std = ([103.939, 116.779, 123.68], [1.0, 1.0, 1.0])
 
-dataFolder = MyDataFolder(data_root='/media/Disk/wangfuyu/data/cxr/801/',
-                          txt='/media/Disk/wangfuyu/data/cxr/801/trainJM.txt',
+dataFolder = MyDataFolder(data_root='/media/Disk/wangfuyu/data/cxr/801',
+                          txt='/media/Disk/wangfuyu/data/cxr/801/testJM.txt',
                           input_transform=transforms.Compose([
                               transforms.ToTensor(),
                               transforms.Lambda(lambda x: x.mul_(255)),
@@ -34,7 +34,7 @@ dataFolder = MyDataFolder(data_root='/media/Disk/wangfuyu/data/cxr/801/',
                           target_transform=MaskToTensor()
                           )
 
-dataloader = DataLoader(dataset=dataFolder, batch_size=opt.batchsize, shuffle=True, num_workers=2)
+dataloader = DataLoader(dataset=dataFolder, batch_size=opt.batchsize, shuffle=False, num_workers=2)
 
 class Deeplab(nn.Module):
     def __init__(self, n_classes):
