@@ -162,8 +162,8 @@ def main():
 
             preds = pred_map.data.max(1)[1].squeeze_(1).cpu().numpy()
             masks = gts_down.data.cpu().numpy()
-            acc, acc_class, miou, _ = evaluate(preds, masks, 2)
-            print acc, acc_class, miou
+            acc, acc_class, _, _, _ = evaluate(preds, masks, 2)
+            print acc, acc_class
 
         if step % 1000 == 0:
             torch.save(D.state_dict(), 'D_step_%d.pth' % step)

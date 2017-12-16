@@ -254,10 +254,10 @@ def train():
             optimizer.step()
 
             preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
-            acc, acc_class, miou, _ = evaluate(preds, ground_truths.squeeze_(0).numpy(), 2)
+            acc, acc_class, _, _, _ = evaluate(preds, ground_truths.squeeze_(0).numpy(), 2)
 
         print 'loss: ', loss
-        print acc, acc_class, miou
+        print acc, acc_class
 
         torch.save(model.state_dict(), 'deeplab_epoch_%d.pth' % epoch)
 
