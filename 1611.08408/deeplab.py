@@ -153,7 +153,7 @@ def weights_init(m):
         # nn.init.constant(m.bias.data, 0)
 
 
-def main():
+def train():
     model = Deeplab(n_classes=2)
     model.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/init.pth'))
     # model.apply(weights_init)
@@ -242,7 +242,7 @@ def main():
         adjust_learning_rate(optimizer, power=0.9, epoch=epoch)
         for index, data in enumerate(dataloader, 0):
             images, ground_truths = data
-            ground_truths = interp(ground_truths.numpy(), shrink=8)
+            ground_truths = torch.from_numpy(interp(ground_truths.numpy(), shrink=8)).float()
 
             imgs = Variable(images.float()).cuda()
             gts = Variable(ground_truths.long()).cuda()
@@ -262,7 +262,29 @@ def main():
         torch.save(model.state_dict(), 'deeplab_epoch_%d.pth' % epoch)
 
 
+def eval():
+    model = Deeplab(n_classes=2)
+    model.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/deeplab_epoch_60.pth'))
+    model.cuda()
+
+    gts_all, predictions_all = [], []
+
+    for index, data in enumerate(dataloader, 0):
+        images, ground_truths = data
+
+        imgs = Variable(images.float()).cuda()
+        gts = Variable(ground_truths.long()).cuda()
+
+        pred_map = model(imgs)
+        pred_map_interp = interp(pred_map.data.max(1)[1].squeeze_(1).cpu().numpy(), zoom=8)
+        predictions_all.append(np.squeeze(pred_map_interp, axis=0))
+        gts_all.append(gts.data.squeeze_(0).cpu().numpy())
+
+    acc, acc_class, miou, _ = evaluate(predictions_all, gts_all, 2)
+    print acc, acc_class, miou
+
+
 if __name__ == '__main__':
-    main()
+    eval()
 
 

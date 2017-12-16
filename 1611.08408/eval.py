@@ -41,8 +41,8 @@ def main():
         gts = Variable(torch.from_numpy(ground_truths).long()).cuda()
 
         pred_map = G(imgs)
-        pred_map_interp = interp(pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy(), zoom=8)
-        predictions_all.append(pred_map_interp)
+        pred_map_interp = interp(pred_map.data.max(1)[1].squeeze_(1).cpu().numpy(), zoom=8)
+        predictions_all.append(np.squeeze(pred_map_interp, axis=0))
         gts_all.append(gts.data.squeeze_(0).cpu().numpy())
 
     acc, acc_class, miou, _ = evaluate(predictions_all, gts_all, 2)

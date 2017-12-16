@@ -12,13 +12,17 @@ def interp(src, zoom=None, shrink=None):
     shape = src.shape
 
     if zoom is not None:
-        height_out = (shape[0] - 1) * zoom + 1
-        width_out = (shape[1] - 1) * zoom + 1
+        height_out = (shape[1] - 1) * zoom + 1
+        width_out = (shape[2] - 1) * zoom + 1
     if shrink is not None:
-        height_out = (shape[0] - 1) / shrink + 1
-        width_out = (shape[1] - 1) / shrink + 1
+        height_out = (shape[1] - 1) / shrink + 1
+        width_out = (shape[2] - 1) / shrink + 1
 
-    dst = cv2.resize(src.astype(np.uint8), (height_out, width_out), cv2.INTER_LINEAR)
+    dst = np.zeros(shape=(shape[0], height_out, width_out))
+
+    for index in xrange(shape[0]):
+        single = src[index, :, :].astype(np.uint8)
+        dst[index, :, :] = cv2.resize(single, (height_out, width_out), cv2.INTER_LINEAR)
     return dst
 
 
