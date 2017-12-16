@@ -133,7 +133,6 @@ class Discriminator(nn.Module):
             nn.Conv2d(256, 512, kernel_size=3, padding=1),
             nn.ReLU(False),
             nn.Conv2d(512, 2, kernel_size=3, padding=1),
-            nn.ReLU(False),
         )
 
     def forward(self, inputs):
