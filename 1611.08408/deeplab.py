@@ -280,8 +280,8 @@ def eval():
         predictions_all.append(np.squeeze(pred_map_interp.astype(long), axis=0))
         gts_all.append(gts.data.squeeze_(0).cpu().numpy())
 
-    acc, acc_class, miou, _ = evaluate(predictions_all, gts_all, 2)
-    print acc, acc_class, miou
+    acc, acc_class, iou, _ = evaluate(predictions_all, gts_all, 2)
+    print acc, acc_class, iou
 
 
 if __name__ == '__main__':
