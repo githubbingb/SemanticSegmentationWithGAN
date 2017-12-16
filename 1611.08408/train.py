@@ -38,9 +38,11 @@ def adjust_learning_rate(optimizer, power=0.9, step=0):
         if index %2 == 0:
             param_group['lr'] = param_group['lr'] * ((1 - 1.0* step / opt.niter) ** (power))
 
+
 def main():
     dataReader = DataReader(data_root='/media/Disk/wangfuyu/data/cxr/801/',
-                    txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt')
+                            txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt',
+                            batchsize=opt.batchsize)
 
     D = Discriminator(n_classes=opt.nclasses, product=True)
     D.apply(weights_init)

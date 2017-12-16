@@ -24,7 +24,8 @@ cudnn.benchmark = True
 
 def main():
     dataReader = DataReader(data_root='/media/Disk/wangfuyu/data/cxr/801/',
-                    txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt', is_train=False)
+                            txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt',
+                            batchsize=opt.batchsize, is_train=False)
 
     G = Generator(n_classes=opt.nclasses)
     G.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/G_step_20000.pth'))
@@ -40,9 +41,9 @@ def main():
         gts = Variable(torch.from_numpy(ground_truths).long()).cuda()
 
         pred_map = G(imgs)
-        predictions_all.append(pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy())
+        pred_map_interp = interp(pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy(), zoom=8)
+        predictions_all.append(pred_map_interp)
         gts_all.append(gts.data.squeeze_(0).cpu().numpy())
-
 
     acc, acc_class, miou, _ = evaluate(predictions_all, gts_all, 2)
     print acc, acc_class, miou
