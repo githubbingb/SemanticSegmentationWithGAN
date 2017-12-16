@@ -31,20 +31,20 @@ def main():
 
     G.cuda()
 
-    gts_all, predictions_all = [], [], []
+    gts_all, predictions_all = [], []
 
-    for step in xrange(0, len(dataReader.length())):
+    for step in xrange(0, dataReader.length()):
         images, _, ground_truths, _ = dataReader.next()
 
         imgs = Variable(torch.from_numpy(images).float()).cuda()
         gts = Variable(torch.from_numpy(ground_truths).long()).cuda()
 
         pred_map = G(imgs)
-        gts_all.append(gts.data.squeeze_(0).cpu().numpy())
         predictions_all.append(pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy())
+        gts_all.append(gts.data.squeeze_(0).cpu().numpy())
 
 
-    acc, acc_class, miou, _ = evaluate(preds, masks, 2)
+    acc, acc_class, miou, _ = evaluate(predictions_all, gts_all, 2)
     print acc, acc_class, miou
 
 
