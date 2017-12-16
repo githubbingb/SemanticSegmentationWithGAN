@@ -37,7 +37,7 @@ def adjust_learning_rate(optimizer, power=0.9, step=0):
     for index, param_group in enumerate(optimizer.param_groups):
         if index %2 == 0:
             param_group['lr'] = param_group['lr'] * ((1 - 1.0* step / opt.niter) ** (power))
-    return optimizer
+    # return optimizer
 
 
 def main():
@@ -132,8 +132,8 @@ def main():
                            ], momentum=0.9, weight_decay=5e-4)
 
     for step in xrange(0, opt.niter):
-        optimizerG = adjust_learning_rate(optimizerG)
-        optimizerD = adjust_learning_rate(optimizerD)
+        adjust_learning_rate(optimizerG, step=step)
+        adjust_learning_rate(optimizerD, step=step)
 
         for index, param_group in enumerate(optimizerD.param_groups):
             print param_group['lr']
