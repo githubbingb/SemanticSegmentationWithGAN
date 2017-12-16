@@ -122,13 +122,13 @@ class Discriminator(nn.Module):
             nn.ReLU(False),
             nn.Conv2d(128, 128, kernel_size=3, padding=1),
             nn.ReLU(False),
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
 
             nn.Conv2d(128, 256, kernel_size=3, padding=1),
             nn.ReLU(False),
             nn.Conv2d(256, 256, kernel_size=3, padding=1),
             nn.ReLU(False),
-            nn.MaxPool2d(kernel_size=3, stride=2, padding=1),
+            nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
 
             nn.Conv2d(256, 512, kernel_size=3, padding=1),
             nn.ReLU(False),
