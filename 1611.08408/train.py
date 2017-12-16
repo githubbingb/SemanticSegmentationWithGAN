@@ -135,9 +135,6 @@ def main():
         adjust_learning_rate(optimizerG, step=step)
         adjust_learning_rate(optimizerD, step=step)
 
-        for index, param_group in enumerate(optimizerD.param_groups):
-            print param_group['lr']
-
         images, images_down, _, ground_truths_down = dataReader.next()
 
         imgs = Variable(torch.from_numpy(images).float()).cuda()
