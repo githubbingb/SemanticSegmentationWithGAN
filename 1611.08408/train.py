@@ -44,7 +44,7 @@ def main():
                             txt='/media/Disk/wangfuyu/data/cxr/801/odd_id.txt',
                             batchsize=opt.batchsize)
 
-    D = Discriminator(n_classes=opt.nclasses, product=True)
+    D = Discriminator(n_classes=opt.nclasses, product=False)
     D.apply(weights_init)
 
     G = Generator(n_classes=opt.nclasses)
@@ -122,7 +122,13 @@ def main():
                             'lr': 20 * opt.lr},
                            ], momentum=0.9, weight_decay=5e-4)
 
-    optimizerD = optim.SGD(D.parameters(), lr=1e-3, momentum=0.9, weight_decay=5e-4)
+    optimizerD = optim.SGD([{'params': [param for name, param in D.features.named_parameters() if
+                                       name[-4] != 'bias'],
+                            'lr': 1e-4},
+                           {'params': [param for name, param in D.features.named_parameters() if
+                                       name[-4] == 'bias'],
+                            'lr': 2*1e-4},
+                           ], momentum=0.9, weight_decay=5e-4)
 
     for step in xrange(0, opt.niter):
         adjust_learning_rate(optimizerG)
@@ -145,7 +151,7 @@ def main():
         DLoss_fake.backward()
 
         # x_real = Variable(product(torch.from_numpy(images_down).float(), onehot_encoder(ground_truths_down, n_classes=opt.nclasses))).cuda()
-        x_real = Variable(onehot_encoder(ground_truths_down)).cuda()
+        x_real = Variable(onehot_encoder(ground_truths_down, n_classes=opt.nclasses)).cuda()
         y_real = D(x_real)
         DLoss_real = mceLoss(y_real, real_label)
         DLoss_real.backward()
@@ -168,8 +174,8 @@ def main():
             print acc, acc_class
 
         if step % 1000 == 0:
-            torch.save(D.state_dict(), 'D_step_%d.pth' % step)
-            torch.save(G.state_dict(), 'G_step_%d.pth' % step)
+            torch.save(D.state_dict(), 'D_base_step_%d.pth' % step)
+            torch.save(G.state_dict(), 'G_base_step_%d.pth' % step)
 
 
 if __name__ == '__main__':
