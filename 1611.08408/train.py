@@ -157,8 +157,9 @@ def main():
         DLoss_fake.backward()
 
         # x_real = Variable(product(torch.from_numpy(images_down).float(), onehot_encoder(ground_truths_down, n_classes=opt.nclasses))).cuda()
+        #x_real = Variable(torch.from_numpy(np.concatenate((onehot, images_down), axis=1)).float()).cuda()
         onehot = onehot_encoder(ground_truths_down, n_classes=opt.nclasses)
-        x_real = Variable(torch.from_numpy(np.concatenate((onehot, images_down), axis=1)).float()).cuda()
+        x_real = Variable(torch.from_numpy(onehot).float()).cuda()
         y_real = D(x_real)
         DLoss_real = mceLoss(y_real, real_label)
         DLoss_real.backward()
