@@ -46,10 +46,20 @@ def _fast_hist(label_pred, label_true, num_classes):
     return hist
 
 
+def dice_coeff(pred, label):
+    smooth = 1.
+    pred_f = pred.flatten()
+    label_f = label.flatten()
+    intersection = (pred_f * label_f).sum()
+    score = (2. * intersection + smooth) / (pred_f.sum() + label_f.sum() + smooth)
+    return score
+
+
 def evaluate(predictions, gts, num_classes):
     hist = np.zeros((num_classes, num_classes))
     for lp, lt in zip(predictions, gts):
         hist += _fast_hist(lp.flatten(), lt.flatten(), num_classes)
+        dice = dice_coeff(lp, lt)
     # axis 0: gt, axis 1: prediction
     acc = np.diag(hist).sum() / hist.sum()
     acc_cls = np.diag(hist) / hist.sum(axis=1)
@@ -59,7 +69,7 @@ def evaluate(predictions, gts, num_classes):
     freq = hist.sum(axis=1) / hist.sum()
     fwavacc = (freq[freq > 0] * iu[freq > 0]).sum()
 
-    return acc, acc_cls, iu, fwavacc
+    return acc, acc_cls, iu, fwavacc, dice
 
 
 def onehot_encoder(ground_truth, n_classes):

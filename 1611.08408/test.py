@@ -1,8 +1,9 @@
-from reader import *
+import numpy as np
 
-Reader = DataReader(data_root='/media/Disk/wangfuyu/data/cxr/801/',
-                    txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt')
+a = np.array([[1,1,0],[1,0,1]])
+b = np.array([[0,1,1],[0,0,1]])
 
-while(1):
-    a, b, c, d = Reader.next()
-    print a.shape, b.shape, c.shape, d.shape
+a_f = a.flatten()
+b_f = b.flatten()
+
+print (a_f*b_f).sum()
