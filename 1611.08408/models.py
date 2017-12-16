@@ -107,14 +107,16 @@ class Generator(nn.Module):
 
 
 class Discriminator(nn.Module):
-    def __init__(self, n_classes, product = False):
+    def __init__(self, n_classes, product = False, concat=False):
         super(Discriminator, self).__init__()
         self.n_classes = n_classes
-        self.channels = 1
+        self.channels = n_classes
         if product:
             self.channels *= 3
+        if concat:
+            self.channels += 3
         self.features = nn.Sequential(
-            nn.Conv2d(self.channels * self.n_classes, 96, kernel_size=3, padding=1),
+            nn.Conv2d(self.channels, 96, kernel_size=3, padding=1),
             nn.ReLU(False),
             nn.Conv2d(96, 128, kernel_size=3, padding=1),
             nn.ReLU(False),

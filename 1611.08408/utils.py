@@ -85,4 +85,4 @@ def onehot_encoder(ground_truth, n_classes):
                 onehot = np.concatenate((onehot, mask), axis=0)
         outputs[i, :, :, :] = onehot
 
-    return torch.from_numpy(outputs).float()
+    return outputs

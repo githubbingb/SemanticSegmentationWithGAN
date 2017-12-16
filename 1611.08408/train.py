@@ -11,7 +11,7 @@ from reader import *
 from models import Generator, Discriminator
 from utils import *
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--batchsize', type=int, default=1, help='input batch size')
@@ -27,16 +27,17 @@ cudnn.benchmark = True
 def weights_init(m):
     classname = m.__class__.__name__
     if classname.find('Conv') != -1:
-        # nn.init.xavier_normal(m.weight.data)
-        # nn.init.constant(m.bias.data, 0)
-        nn.init.normal(m.weight.data, mean=0, std=0.01)
+        nn.init.xavier_normal(m.weight.data)
         nn.init.constant(m.bias.data, 0)
+        # nn.init.normal(m.weight.data, mean=0, std=0.01)
+        # nn.init.constant(m.bias.data, 0)
 
 
 def adjust_learning_rate(optimizer, power=0.9, step=0):
     for index, param_group in enumerate(optimizer.param_groups):
         if index %2 == 0:
             param_group['lr'] = param_group['lr'] * ((1 - 1.0* step / opt.niter) ** (power))
+    # return optimizer
 
 
 def main():
@@ -133,6 +134,10 @@ def main():
     for step in xrange(0, opt.niter):
         adjust_learning_rate(optimizerG)
         adjust_learning_rate(optimizerD)
+
+        for index, param_group in enumerate(optimizerD.param_groups):
+            print param_group['lr']
+
         images, images_down, _, ground_truths_down = dataReader.next()
 
         imgs = Variable(torch.from_numpy(images).float()).cuda()
@@ -146,16 +151,17 @@ def main():
         pred_map = G(imgs)
         # x_fake = Variable(product(torch.from_numpy(images_down).float(), f.softmax(pred_map).cpu().data)).cuda()
         x_fake = f.softmax(pred_map)
+        # x_fake = Variable(torch.from_numpy(np.concatenate((f.softmax(pred_map).cpu().data.numpy(), images_down), axis=1)).float()).cuda()
         y_fake = D(x_fake.detach())
         DLoss_fake = mceLoss(y_fake, fake_label)
         DLoss_fake.backward()
 
         # x_real = Variable(product(torch.from_numpy(images_down).float(), onehot_encoder(ground_truths_down, n_classes=opt.nclasses))).cuda()
-        x_real = Variable(onehot_encoder(ground_truths_down, n_classes=opt.nclasses)).cuda()
+        onehot = onehot_encoder(ground_truths_down, n_classes=opt.nclasses)
+        x_real = Variable(torch.from_numpy(np.concatenate((onehot, images_down), axis=1)).float()).cuda()
         y_real = D(x_real)
         DLoss_real = mceLoss(y_real, real_label)
         DLoss_real.backward()
-
         optimizerD.step()
 
         # train Generator
@@ -174,8 +180,8 @@ def main():
             print acc, acc_class
 
         if step % 1000 == 0:
-            torch.save(D.state_dict(), 'D_base_step_%d.pth' % step)
-            torch.save(G.state_dict(), 'G_base_step_%d.pth' % step)
+            torch.save(D.state_dict(), 'D_base_concat_step_%d.pth' % step)
+            torch.save(G.state_dict(), 'G_base_concat_step_%d.pth' % step)
 
 
 if __name__ == '__main__':
