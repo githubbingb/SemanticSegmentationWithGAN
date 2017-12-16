@@ -18,9 +18,7 @@ def interp(src, zoom=None, shrink=None):
         height_out = (shape[0] - 1) / shrink + 1
         width_out = (shape[1] - 1) / shrink + 1
 
-    dst = np.zeros(shape=(height_out, width_out))
-
-    dst[:, :, :] = cv2.resize(src.astype(np.uint8), (height_out, width_out), cv2.INTER_LINEAR)
+    dst = cv2.resize(src.astype(np.uint8), (height_out, width_out), cv2.INTER_LINEAR)
     return dst
 
 
