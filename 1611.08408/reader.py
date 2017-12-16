@@ -4,19 +4,21 @@ import cv2
 
 
 class DataReader():
-    def __init__(self, data_root, txt, batchsize=1, scale=801):
+    def __init__(self, data_root, txt, batchsize=1, scale=801, is_train=True):
         self.data_root = data_root
         self.filelist = []
         self.batchsize = batchsize
         self.scale = scale
         self.index = 0
+        self.is_train = is_train
 
         with open(txt, 'r') as f:
             lines = f.readlines()
             for line in lines:
                 self.filelist.append(line[0:-1])
 
-        np.random.shuffle(self.filelist)
+        if self.is_train:
+            np.random.shuffle(self.filelist)
 
     def next(self):
         images = np.zeros((self.scale, self.scale, 3, self.batchsize))
@@ -24,7 +26,7 @@ class DataReader():
         ground_truths = np.zeros((self.scale, self.scale, self.batchsize))
         ground_truths_interp = np.zeros(((self.scale - 1) / 8 + 1, (self.scale - 1) / 8 + 1, self.batchsize))
 
-        if self.index + self.batchsize > len(self.filelist):
+        if self.index + self.batchsize > len(self.filelist) and self.is_train:
             self.index = 0
             np.random.shuffle(self.filelist)
 
@@ -58,3 +60,6 @@ class DataReader():
         ground_truths = ground_truths.transpose((2, 0, 1))
 
         return images, images_interp, ground_truths, ground_truths_interp
+
+    def length(self):
+        return len(self.filelist)

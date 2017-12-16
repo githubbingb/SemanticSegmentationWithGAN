@@ -10,7 +10,7 @@ from DataFolder import MyDataFolder
 from torch.utils.data import DataLoader
 from utils import *
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
 cudnn.benchmark = True
 
@@ -160,6 +160,7 @@ def main():
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
 
+
     model.cuda()
     mceLoss.cuda()
 
@@ -255,8 +256,8 @@ def main():
             preds = pred_map.data.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
             acc, acc_class, miou, _ = evaluate(preds, ground_truths.squeeze_(0).numpy(), 2)
 
-            print 'loss: ', loss
-            print acc, acc_class, miou
+        print 'loss: ', loss
+        print acc, acc_class, miou
 
         torch.save(model.state_dict(), 'deeplab_epoch_%d.pth' % epoch)
 
