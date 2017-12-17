@@ -125,7 +125,7 @@ def main():
     optimizerD = optim.SGD([{'params': [param for name, param in D.features.named_parameters() if
                                        name[-4] != 'bias'],
                             'lr': 1e-3},
-                           {'params': [param for name, param in D.features.named_parameters() if
+                            {'params': [param for name, param in D.features.named_parameters() if
                                        name[-4] == 'bias'],
                             'lr': 2*1e-3},
                            ], momentum=0.99, weight_decay=5e-4)
@@ -185,8 +185,8 @@ def main():
     
 
         if step % 1000 == 0:
-            torch.save(D.state_dict(), 'D_step_softmax_%d.pth' % step)
-            torch.save(G.state_dict(), 'G_step_softmax_%d.pth' % step)
+            torch.save(D.state_dict(), 'D_step_strongD_%d.pth' % step)
+            torch.save(G.state_dict(), 'G_step_strongD_%d.pth' % step)
 
 
 if __name__ == '__main__':
