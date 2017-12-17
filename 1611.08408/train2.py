@@ -54,10 +54,12 @@ def main():
     print D, G
 
     mceLoss = nn.CrossEntropyLoss(ignore_index=255)
+    bceLoss = nn.BCELoss()
 
     G.cuda()
     D.cuda()
     mceLoss.cuda()
+    bceLoss.cuda()
 
     optimizerG = optim.SGD([{'params': [param for name, param in G.features.named_parameters() if
                                        name[-4] != 'bias'],
@@ -124,10 +126,10 @@ def main():
                            ], momentum=0.9, weight_decay=5e-4)
     optimizerD = optim.SGD([{'params': [param for name, param in D.features.named_parameters() if
                                        name[-4] != 'bias'],
-                            'lr': 1e-3},
+                            'lr': 1e-4},
                            {'params': [param for name, param in D.features.named_parameters() if
                                        name[-4] == 'bias'],
-                            'lr': 2*1e-3},
+                            'lr': 2*1e-4},
                            ], momentum=0.99, weight_decay=5e-4)
     # optimizerD = optim.SGD(params=D.parameters(), lr=1e-2, momentum=0.99, weight_decay=5e-4)
 
@@ -140,8 +142,8 @@ def main():
         imgs = Variable(torch.from_numpy(images).float()).cuda()
         gts_down = Variable(torch.from_numpy(ground_truths_down).long()).cuda()
 
-        real_label = Variable(torch.ones(opt.batchsize).long()).cuda()
-        fake_label = Variable(torch.zeros(opt.batchsize).long()).cuda()
+        real_label = Variable(torch.ones(1).float()).cuda()
+        fake_label = Variable(torch.zeros(1).float()).cuda()
 
         # train Discriminator
         D.zero_grad()
@@ -150,7 +152,7 @@ def main():
         x_fake = f.softmax(pred_map)
         # x_fake = Variable(torch.from_numpy(np.concatenate((f.softmax(pred_map).cpu().data.numpy(), images_down), axis=1)).float()).cuda()
         y_fake = D(x_fake.detach())
-        DLoss_fake = mceLoss(y_fake, fake_label)
+        DLoss_fake = bceLoss(y_fake, fake_label)
         DLoss_fake.backward()
 
         # x_real = Variable(product(torch.from_numpy(images_down).float(), onehot_encoder(ground_truths_down, n_classes=opt.nclasses))).cuda()
@@ -158,14 +160,14 @@ def main():
         onehot = onehot_encoder(ground_truths_down, n_classes=opt.nclasses)
         x_real = Variable(torch.from_numpy(onehot).float()).cuda()
         y_real = D(x_real)
-        DLoss_real = mceLoss(y_real, real_label)
+        DLoss_real = bceLoss(y_real, real_label)
         DLoss_real.backward()
         optimizerD.step()
 
         # train Generator
         G.zero_grad()
         y_fake = D(x_fake)
-        GLoss = mceLoss(y_fake, real_label) + mceLoss(pred_map, gts_down)
+        GLoss = bceLoss(y_fake, real_label) + mceLoss(pred_map, gts_down)
         GLoss.backward()
         optimizerG.step()
 
@@ -177,16 +179,9 @@ def main():
             acc, acc_class, _, _, _ = evaluate(preds, masks, 2)
             print acc, acc_class
 
-            preds = y_real.data.max(1)[1].view(-1, 1).squeeze_(1).cpu().numpy()
-            print 'real_pred: ', preds
-
-            preds = y_fake.data.max(1)[1].view(-1, 1).squeeze_(1).cpu().numpy()
-            print 'fake_pred: ', preds
-    
-
         if step % 1000 == 0:
-            torch.save(D.state_dict(), 'D_step_softmax_%d.pth' % step)
-            torch.save(G.state_dict(), 'G_step_softmax_%d.pth' % step)
+            torch.save(D.state_dict(), 'D_step_sigmoid_%d.pth' % step)
+            torch.save(G.state_dict(), 'G_step_sigmoid_%d.pth' % step)
 
 
 if __name__ == '__main__':
