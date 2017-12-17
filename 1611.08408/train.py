@@ -42,7 +42,7 @@ def adjust_learning_rate(optimizer, power=0.9, step=0):
 
 def main():
     dataReader = DataReader(data_root='/media/Disk/wangfuyu/data/cxr/801/',
-                            txt='/media/Disk/wangfuyu/data/cxr/801/odd_id.txt',
+                            txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt',
                             batchsize=opt.batchsize)
 
     D = Discriminator(n_classes=opt.nclasses, product=False)
@@ -178,8 +178,8 @@ def main():
             print acc, acc_class
 
         if step % 1000 == 0:
-            torch.save(D.state_dict(), 'D_base_concat_step_%d.pth' % step)
-            torch.save(G.state_dict(), 'G_base_concat_step_%d.pth' % step)
+            torch.save(D.state_dict(), 'D_step_%d.pth' % step)
+            torch.save(G.state_dict(), 'G_step_%d.pth' % step)
 
 
 if __name__ == '__main__':
