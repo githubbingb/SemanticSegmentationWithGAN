@@ -10,7 +10,7 @@ from DataFolder import MyDataFolder
 from torch.utils.data import DataLoader
 from utils import *
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
 cudnn.benchmark = True
 
@@ -239,7 +239,7 @@ def train():
     #                        ], lr=1e-3, momentum=0.9, weight_decay=5e-4)
 
     for epoch in range(opt.niter):
-        adjust_learning_rate(optimizer, power=0.9, epoch=epoch)
+        # adjust_learning_rate(optimizer, power=0.9, epoch=epoch)
         for index, data in enumerate(dataloader, 0):
             images, ground_truths = data
             ground_truths = torch.from_numpy(interp(ground_truths.numpy(), shrink=8)).float()

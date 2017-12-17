@@ -28,7 +28,7 @@ def main():
                             batchsize=opt.batchsize, is_train=False)
 
     G = Generator(n_classes=opt.nclasses)
-    G.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/G_step_20000.pth'))
+    G.load_state_dict(torch.load('/media/Disk/wangfuyu/SemanticSegmentationWithGAN/1611.08408/G_step_softmax_20000.pth'))
 
     G.cuda()
 
