@@ -130,7 +130,7 @@ def main():
     #                                    name[-4] == 'bias'],
     #                         'lr': 2*1e-4},
     #                        ], momentum=0.9, weight_decay=5e-4)
-    optimizerD = optim.SGD(lr=1e-2, momentum=0.99, weight_decay=5e-4)
+    optimizerD = optim.SGD(params=D.parameters(), lr=1e-2, momentum=0.99, weight_decay=5e-4)
 
     for step in xrange(0, opt.niter):
         adjust_learning_rate(optimizerG, step=step)
