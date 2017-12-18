@@ -54,7 +54,7 @@ def main():
         predictions_all.append(np.squeeze(pred_map_interp.astype(long), axis=0))
         gts_all.append(gts.data.squeeze_(0).cpu().numpy())
 
-        print D(f.softmax(pred_map)).data.max(1)[1]
+        # print D(f.softmax(pred_map)).data.max(1)[1]
 
     acc, acc_class, iou, _, dice = evaluate(predictions_all, gts_all, 2)
     print acc, acc_class, iou, dice

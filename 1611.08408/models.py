@@ -5,7 +5,7 @@ from collections import OrderedDict
 
 
 class Generator(nn.Module):
-    def __init__(self, n_classes):
+    def __init__(self, n_classes, keep_plob = 0.5):
         super(Generator, self).__init__()
         self.n_classes = n_classes
         self.features = nn.Sequential(
@@ -49,11 +49,11 @@ class Generator(nn.Module):
         self.fc1 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=6, dilation=6),
             nn.ReLU(False),
-            nn.Dropout(0.5, False),
+            nn.Dropout(keep_plob, False),
 
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
-            nn.Dropout(0.5, False)
+            nn.Dropout(keep_plob, False)
         )
 
         self.classifiers1 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
@@ -61,33 +61,33 @@ class Generator(nn.Module):
         self.fc2 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=12, dilation=12),
             nn.ReLU(False),
-            nn.Dropout(0.5, False),
+            nn.Dropout(keep_plob, False),
 
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
-            nn.Dropout(0.5, False)
+            nn.Dropout(keep_plob, False)
         )
         self.classifiers2 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
 
         self.fc3 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=18, dilation=18),
             nn.ReLU(False),
-            nn.Dropout(0.5, False),
+            nn.Dropout(keep_plob, False),
 
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
-            nn.Dropout(0.5, False)
+            nn.Dropout(keep_plob, False)
         )
         self.classifiers3 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
 
         self.fc4 = nn.Sequential(
             nn.Conv2d(512, 1024, kernel_size=3, padding=24, dilation=24),
             nn.ReLU(False),
-            nn.Dropout(0.5, False),
+            nn.Dropout(keep_plob, False),
 
             nn.Conv2d(1024, 1024, kernel_size=1),
             nn.ReLU(False),
-            nn.Dropout(0.5, False)
+            nn.Dropout(keep_plob, False)
         )
         self.classifiers4 = nn.Conv2d(1024, self.n_classes, kernel_size=1)
 
@@ -131,6 +131,45 @@ class Discriminator(nn.Module):
             nn.ReLU(False),
             nn.MaxPool2d(kernel_size=3, stride=1, padding=0),
 
+
+            nn.Conv2d(256, 512, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(512, 2, kernel_size=3, padding=1),
+        )
+    
+    def forward(self, inputs):
+        outputs = self.features(inputs)
+        outputs = f.avg_pool2d(outputs, kernel_size=outputs.size()[2]).contiguous()
+
+        # return outputs.view(-1,1).squeeze(1)
+        return outputs.view(-1, 2)
+
+
+class StrongDiscriminator(nn.Module):
+    def __init__(self, n_classes, product=False, concat=False):
+        super(Discriminator, self).__init__()
+        self.n_classes = n_classes
+        self.channels = n_classes
+        if product:
+            self.channels *= 3
+        if concat:
+            self.channels += 3
+        self.features = nn.Sequential(
+            nn.Conv2d(self.channels, 96, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(96, 128, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(128, 128, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.MaxPool2d(kernel_size=3, stride=1, padding=0),
+
+            nn.Conv2d(128, 256, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            # nn.Conv2d(256, 512, kernel_size=3, padding=1),
+            nn.ReLU(False),
+            nn.MaxPool2d(kernel_size=3, stride=1, padding=0),
+
             nn.Conv2d(256, 512, kernel_size=3, padding=1),
             nn.ReLU(False),
             nn.Conv2d(512, 512, kernel_size=3, padding=1),
@@ -145,13 +184,14 @@ class Discriminator(nn.Module):
             # nn.ReLU(False),
             # nn.Conv2d(512, 2, kernel_size=3, padding=1),
         )
-    
+
     def forward(self, inputs):
         outputs = self.features(inputs)
         outputs = f.avg_pool2d(outputs, kernel_size=outputs.size()[2]).contiguous()
 
         # return outputs.view(-1,1).squeeze(1)
-        return outputs.view(-1,2)
+        return outputs.view(-1, 2)
+
 
 
 
