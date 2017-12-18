@@ -45,7 +45,7 @@ def main():
                             txt='/media/Disk/wangfuyu/data/cxr/801/trainJM_id.txt',
                             batchsize=opt.batchsize)
 
-    D = Discriminator(n_classes=opt.nclasses, product=False)
+    D = Discriminator(n_classes=opt.nclasses, product=False, concat=True)
     D.apply(weights_init)
 
     G = Generator(n_classes=opt.nclasses)
@@ -186,8 +186,8 @@ def main():
     
 
         if step % 1000 == 0:
-            torch.save(D.state_dict(), 'D_step_strongD_%d.pth' % step)
-            torch.save(G.state_dict(), 'G_step_strongD_%d.pth' % step)
+            torch.save(D.state_dict(), 'D_step_concat_%d.pth' % step)
+            torch.save(G.state_dict(), 'G_step_concat_%d.pth' % step)
 
 
 if __name__ == '__main__':
