@@ -132,8 +132,8 @@ def main():
     # optimizerD = optim.SGD(params=D.parameters(), lr=1e-2, momentum=0.99, weight_decay=5e-4)
 
     for step in xrange(0, opt.niter):
-        # adjust_learning_rate(optimizerG, step=step)
-        # adjust_learning_rate(optimizerD, step=step)
+        adjust_learning_rate(optimizerG, step=step)
+        adjust_learning_rate(optimizerD, step=step)
 
         images, images_down, _, ground_truths_down = dataReader.next()
 
@@ -147,8 +147,9 @@ def main():
         D.zero_grad()
         pred_map = G(imgs)
         # x_fake = Variable(product(torch.from_numpy(images_down).float(), f.softmax(pred_map).cpu().data)).cuda()
-        x_fake = f.softmax(pred_map)
+        # x_fake = f.softmax(pred_map)
         # x_fake = Variable(torch.from_numpy(np.concatenate((f.softmax(pred_map).cpu().data.numpy(), images_down), axis=1)).float()).cuda()
+        x_fake = torch.cat((f.softmax(pred_map), gts_down), dim=1)
         y_fake = D(x_fake.detach())
         DLoss_fake = mceLoss(y_fake, fake_label)
         DLoss_fake.backward()

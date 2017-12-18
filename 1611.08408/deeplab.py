@@ -36,6 +36,7 @@ dataFolder = MyDataFolder(data_root='/media/Disk/wangfuyu/data/cxr/801',
 
 dataloader = DataLoader(dataset=dataFolder, batch_size=opt.batchsize, shuffle=False, num_workers=2)
 
+
 class Deeplab(nn.Module):
     def __init__(self, n_classes):
         super(Deeplab, self).__init__()

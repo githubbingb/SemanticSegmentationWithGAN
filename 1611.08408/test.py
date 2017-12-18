@@ -1,6 +1,5 @@
-def t(a):
-    a = 2
+import numpy as np
 
-b = 3
-t(b)
-print b
+point = np.zeros(2)
+print point
+
